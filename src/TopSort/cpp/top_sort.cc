@@ -30,7 +30,9 @@ bool explore(GraphNode* node,
   seenNodes.insert(node);
   for (std::list<GraphNode*>::iterator it = node->neighbors_begin();
         it != node->neighbors_end(); ++it) {
-    explore(*it, unmarkedNodes, seenNodes, sortedNodes);
+    if (!explore(*it, unmarkedNodes, seenNodes, sortedNodes)) {
+      return false;
+    }
   }
   seenNodes.erase(node);
   unmarkedNodes.erase(node);
