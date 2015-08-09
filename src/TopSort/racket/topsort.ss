@@ -1,5 +1,6 @@
 #lang racket
 (require racket/set)
+(provide topsort)
 
 ;; Graph input is a list of lists. Each list inside has the node as car
 ;; and the list of neighbors as cdr.
@@ -16,34 +17,29 @@
   
   (define (explore node sorted unmarked seen)
     
-    (define (explore-helper node-list sorted unmarked seen)
-      (cond [(empty? node-list) (list #t sorted unmarked seen)]
-            [else (let* ([next-node (car node-list)]
-                         [full-data (explore next-node sorted unmarked seen)]
-                         [is-cycle (not (car full-data))]
-                         [sorted-new (cadr full-data)]
-                         [unmarked-new (caddr full-data)]
-                         [seen-new (cadddr full-data)])
-                    (cond [is-cycle (list #f sorted-new unmarked-new seen-new)]
-                          [else (explore-helper (cdr node-list) sorted-new unmarked-new seen-new)]))]))
+    (define (explore-helper node retval)
+      (cond [(car retval) (explore node (cadr retval) (caddr retval) (cadddr retval))]
+            [else retval]))
     
     (cond [(set-member? seen node) (list #f sorted unmarked seen)] ;; cycle found.
-          [(not (set-member? unmarked node)) (list #t sorted unmarked seen)] ;; Already explored, skip.
+          [(not (set-member? unmarked node)) (list #t sorted unmarked seen)] ;; Already explored.
           [else (let* ([tmp-seen (set-add seen node)]
-                       [full-data (explore-helper (hash-ref graph node) sorted unmarked tmp-seen)]
-                       [is-cycle (not (car full-data))]
-                       [sorted-new (cons node (cadr full-data))]
-                       [unmarked-new (set-remove (caddr full-data) node)]
-                       [seen-new (set-remove (cadddr full-data) node)])
+                       [retval (foldl explore-helper 
+                                      (list #t sorted unmarked tmp-seen) 
+                                      (hash-ref graph node))] ;; Explore all neighbors
+                       [is-cycle (not (car retval))]
+                       [sorted-new (cons node (cadr retval))]
+                       [unmarked-new (set-remove (caddr retval) node)]
+                       [seen-new (set-remove (cadddr retval) node)])
                   (list (not is-cycle) sorted-new unmarked-new seen-new))]))
   
   (cond [(set-empty? unmarked) (cons sorted #t)] ;; no more nodes.
         [else (let* ([node (set-first unmarked)] ;; pick some node.
-                     [full-data (explore node sorted unmarked seen)] ;; Run dfs.
-                     [is-cycle (not (car full-data))]
-                     [sorted-new (cadr full-data)]
-                     [unmarked-new (caddr full-data)]
-                     [seen-new (cadddr full-data)])
+                     [retval (explore node sorted unmarked seen)] ;; Run dfs.
+                     [is-cycle (not (car retval))]
+                     [sorted-new (cadr retval)]
+                     [unmarked-new (caddr retval)]
+                     [seen-new (cadddr retval)])
                 (cond [is-cycle (cons sorted #f)] ;; Cannot do topSort.
                       [else (topsort-helper graph sorted-new unmarked-new seen-new)]))]))
 
