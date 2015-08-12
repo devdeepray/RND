@@ -3,11 +3,22 @@
 
 #include <list>
 /**
- * Abstract class representing a node in a directed graph.
+ * Class representing a node in a directed graph.
  */
 class GraphNode {
+private:
+  std::list<GraphNode*> neighbors;
 public:
-  virtual typename std::list<GraphNode*>::iterator neighbors_begin();
-  virtual typename std::list<GraphNode*>::iterator neighbors_end();
+  int n;
+  GraphNode(int _n) {
+    n = _n;
+  }
+  std::list<GraphNode*> getNeighbors() {
+    return neighbors;
+  }
+
+  void addNeighbor(GraphNode* node) {
+    neighbors.push_back(node);
+  }
 };
 #endif // _GRAPH_NODE_H_

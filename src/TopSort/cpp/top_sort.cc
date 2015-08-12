@@ -28,8 +28,9 @@ bool explore(GraphNode* node,
     return true;
   }
   seenNodes.insert(node);
-  for (std::list<GraphNode*>::iterator it = node->neighbors_begin();
-        it != node->neighbors_end(); ++it) {
+  std::list <GraphNode*> nbr_list = node->getNeighbors();
+  for (std::list<GraphNode*>::iterator it = nbr_list.begin();
+        it != nbr_list.end(); ++it) {
     if (!explore(*it, unmarkedNodes, seenNodes, sortedNodes)) {
       return false;
     }
