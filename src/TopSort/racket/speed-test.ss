@@ -6,29 +6,36 @@
         [else (let ([smaller-dag (gen-big-dag (- n 1))])
                 (reverse (cons (cons n (reverse (car smaller-dag))) smaller-dag)))]))
 
-(define big-dag (gen-big-dag 5000))
-
 (define (perf-test func num-runs)
-  (define (perf-helper n) ;; num runs
-    (cond [(= n 0) 1]
-          [else (begin (func)
-                       (perf-helper (- n 1)))]))
-  (begin (define start-t (current-inexact-milliseconds))
-         (perf-helper num-runs)
-         (define end-t (current-inexact-milliseconds))
-         (/ (- end-t start-t) num-runs)))
+  (define (perf-helper n ttime) ;; num runs
+    (cond [(= n 0) ttime]
+          [else (begin (collect-garbage)
+                       (define start-t (current-inexact-milliseconds))
+                       (func)
+                       (define end-t (current-inexact-milliseconds))
+                       (perf-helper (- n 1) (+ (- end-t start-t) ttime)))]))
+         (/ (perf-helper num-runs 0) num-runs))
 
-(define topsort-big-dag
-  (λ () (topsort big-dag)))
-  
-(define topsort-m-big-dag
-  (λ () (topsort-m big-dag)))
+(define (test start-dag end-dag delta num-run sorter)
+  (define (test-helper dag-size)
+    (cond [(> dag-size end-dag) 0]
+          [else (let ([big-dag (gen-big-dag dag-size)])
+                  (begin (define (func)
+                           (sorter big-dag))
+                         (display dag-size)
+                         (display ",")
+                         (collect-garbage)
+                         (display (perf-test func num-run))
+                         (display ",")
+                         (newline)
+                         (test-helper (+ dag-size delta))))]))
+  (test-helper start-dag))
 
-(display "non-mutable version test")
+(display "Pure functional speed test")
 (newline)
-(display (perf-test topsort-big-dag 10))
-(newline)
-(display "mutable version test")
-(newline)
-(display (perf-test topsort-m-big-dag 10))
-(newline)
+(test 200 800 200 10 topsort)
+(test 850 900 10 10 topsort) ;; Weird jump at 872 nodes. Maybe a data structure switch.
+(test 1000 10000 200 10 topsort)
+;; (display "Mutable speed test")
+;; (newline)
+;; (test 500 10000 200 10 topsort-m)

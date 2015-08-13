@@ -1,4 +1,6 @@
 all:
 	raco exe speed-test.ss
 clean:
-	rm speed-test
+	rm -f speed-test
+	rm -rf compiled
+
