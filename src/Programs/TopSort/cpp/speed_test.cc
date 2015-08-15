@@ -41,9 +41,9 @@ void deleteGraph(list<GraphNode*> nodeList) {
 
 int main() {
 
-  int NUM_RUNS = 100;
+  int NUM_RUNS = 10;
   // Construct graph.
-  for (int size = 500; size <= 10000; size += 200) {
+  for (int size = 1000; size <= 50000; size += 1000) {
     list<GraphNode*> nodeList = genGraph(size);
     long start = getCurrentTime();
     for (int i = 0; i < NUM_RUNS; ++i) {
