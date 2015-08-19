@@ -30,5 +30,5 @@ test start_dag end_dag delta num_run sorter_func =
       (test_helper (dag_size + delta))
 
 main = do
- test 1000 50000 1000 1 topsort
+ test 1000 5000 100 1 topsort
 

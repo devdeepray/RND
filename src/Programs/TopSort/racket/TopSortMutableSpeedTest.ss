@@ -1,9 +1,3 @@
 #lang racket
 (require "TopSortMutable.ss" "TopSortTestHelpers.ss")
-
-
-(begin 
-  (test 200 800 200 10 topsort-m)
-  (test 850 900 10 10 topsort-m) ;; Weird jump at 872 nodes. Maybe a data structure switch.
-  (test 1000 10000 200 10 topsort-m)
-  (newline))
+(define a (test 1000 5000 100 1 topsort-m))

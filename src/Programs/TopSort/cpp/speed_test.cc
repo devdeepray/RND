@@ -27,7 +27,8 @@ list<GraphNode*> genGraph(int n) {
          ++it) {
       newNode->addNeighbor(*it);
     }
-    nodeList.push_back(newNode);
+    newNode->addNeighbor(last);
+    nodeList.push_front(newNode);
     nodeList.reverse();
   }
   return nodeList;
@@ -41,14 +42,14 @@ void deleteGraph(list<GraphNode*> nodeList) {
 
 int main() {
 
-  int NUM_RUNS = 10;
+  int NUM_RUNS = 1;
   // Construct graph.
-  for (int size = 1000; size <= 50000; size += 1000) {
+  for (int size = 1000; size <= 5000; size += 100) {
     list<GraphNode*> nodeList = genGraph(size);
     long start = getCurrentTime();
     for (int i = 0; i < NUM_RUNS; ++i) {
       top_sort(nodeList);
-    }
+    } 
     long end = getCurrentTime();
     deleteGraph(nodeList);
     cout << size << "," << (double) (end - start) / NUM_RUNS << "," << endl;
