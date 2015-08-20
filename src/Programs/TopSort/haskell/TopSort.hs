@@ -8,18 +8,19 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 
 
-data ExploreRes = ExploreRes { getCansort :: Bool,
-                               getSorted :: [Integer],
-                               getUnmarked :: Set Integer,
-                               getSeen :: Set Integer } deriving (Show)
+
+data ExploreRes a = ExploreRes { getCansort :: Bool,
+                               getSorted :: [a],
+                               getUnmarked :: Set a,
+                               getSeen :: Set a} deriving (Show)
 
 
 -- graph is a list of pairs, where each pair is (node num, (list of neighbor nodes))
-topsort :: [(Integer, [Integer])] -> ([Integer], Bool)
+topsort :: Ord a => [(a, [a])] -> ([a], Bool)
 topsort graph =
   topsort_helper (Map.fromList graph) [] (Set.fromList (map fst graph)) Set.empty
 
-topsort_helper :: Map Integer [Integer] -> [Integer] -> Set Integer -> Set Integer -> ([Integer], Bool)
+topsort_helper :: Ord a => Map a [a] -> [a] -> Set a -> Set a -> ([a], Bool)
 topsort_helper graph sorted unmarked seen
   | Set.null unmarked = (sorted, True) -- Finished, no more nodes
   | not (getCansort explore_res) = (sorted, False) -- Cannot perform sort, cycle present
@@ -27,7 +28,7 @@ topsort_helper graph sorted unmarked seen
   where
     explore_res = explore graph (Set.findMin unmarked) sorted unmarked seen
     
-explore :: Map Integer [Integer] -> Integer -> [Integer] -> Set Integer -> Set Integer -> ExploreRes
+explore :: Ord a => Map a [a] -> a -> [a] -> Set a -> Set a -> ExploreRes a
 explore graph node sorted unmarked seen
   | Set.member node seen = ExploreRes False sorted unmarked seen -- Cycle found
   | Set.notMember node unmarked = ExploreRes True sorted unmarked seen -- Already explored, skip
@@ -40,7 +41,6 @@ explore graph node sorted unmarked seen
                         (ExploreRes True sorted unmarked (Set.insert node seen)) 
                         (Map.findWithDefault [] node graph)
                   where
-                    explore_helper ::  ExploreRes -> Integer -> ExploreRes
                     explore_helper exp_h_res node
                       | getCansort exp_h_res = explore graph node (getSorted exp_h_res) 
                                                        (getUnmarked exp_h_res) (getSeen exp_h_res)
