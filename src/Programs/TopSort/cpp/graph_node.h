@@ -8,17 +8,20 @@
 class GraphNode {
 private:
   std::list<GraphNode*> neighbors;
+
 public:
-  int n;
+  int n; // Placeholder for data to be stored in the node.
+
   GraphNode(int _n) {
     n = _n;
-  }
-  std::list<GraphNode*> getNeighbors() {
-    return neighbors;
   }
 
   void addNeighbor(GraphNode* node) {
     neighbors.push_back(node);
+  }
+
+  std::list<GraphNode*> getNeighbors() {
+    return neighbors;
   }
 };
 #endif // _GRAPH_NODE_H_

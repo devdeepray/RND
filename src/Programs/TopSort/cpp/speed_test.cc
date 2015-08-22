@@ -6,6 +6,9 @@
 
 using namespace std;
 
+/**
+ * Get the current time from epoch in ms.
+ */
 long getCurrentTime() {
   struct timeval tp;
   gettimeofday(&tp, NULL);
@@ -13,6 +16,11 @@ long getCurrentTime() {
   return ms;
 }
 
+/**
+ * Generate a dense graph without cycles.
+ * Generated graph has O(n^2) edges and node i has edges to 
+ * nodes < i.
+ */
 list<GraphNode*> genGraph(int n) {
 
   list <GraphNode*> nodeList;
@@ -34,6 +42,9 @@ list<GraphNode*> genGraph(int n) {
   return nodeList;
 }
 
+/**
+ * Free memory allocated for the graph.
+ */
 void deleteGraph(list<GraphNode*> nodeList) {
   for (auto iter = nodeList.begin(); iter != nodeList.end(); ++iter) {
     delete (*iter);
@@ -43,7 +54,6 @@ void deleteGraph(list<GraphNode*> nodeList) {
 int main() {
 
   int NUM_RUNS = 1;
-  // Construct graph.
   for (int size = 1000; size <= 5000; size += 100) {
     list<GraphNode*> nodeList = genGraph(size);
     long start = getCurrentTime();
