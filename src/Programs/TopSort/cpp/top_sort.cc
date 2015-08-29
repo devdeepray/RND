@@ -1,20 +1,20 @@
 #include "top_sort.h"
 #include <algorithm>
 
-bool top_sort(std::vector<GraphNode*> &graphNodes) {
+std::vector<GraphNode*> top_sort(std::vector<GraphNode*> &graphNodes) {
 
   std::vector<GraphNode*> sorted;
   for (auto node : graphNodes) {
     if (!explore(node, sorted)) {
-      return false; // Cycle was detected during DFS.
+      return std::vector<GraphNode*>(); // Cycle was detected during DFS.
     }
   }
 
-  graphNodes = sorted;
   for (auto node : graphNodes) {
     node->setExplored(false);
   }
-  reverse(graphNodes.begin(), graphNodes.end());
+  reverse(sorted.begin(), sorted.end());
+  return sorted;
 }
 
 bool explore(GraphNode* node, std::vector<GraphNode*> &sorted) {
