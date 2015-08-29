@@ -24,23 +24,22 @@ long getCurrentTime() {
  */
 vector<GraphNode*> genGraph(int n) {
 
-  list <GraphNode*> nodeList;
-  nodeList.push_back(new GraphNode(1));
+  vector <GraphNode*> nodeList;
+  nodeList.push_back(new GraphNode(0));
 
   for (int i = 1; i < n; ++i) {
-    GraphNode* last = (*nodeList.begin());
-    GraphNode* newNode = new GraphNode(i+1);
+    GraphNode* last = nodeList[i - 1];
+    GraphNode* newNode = new GraphNode(i);
     std::vector<GraphNode*> last_neighbors = last->getNeighbors();
-    for (std::vector<GraphNode*>::reverse_iterator it = last_neighbors.rbegin();
+    for (auto it = last_neighbors.rbegin();
          it != last_neighbors.rend();
          ++it) {
       newNode->addNeighbor(*it);
     }
     newNode->addNeighbor(last);
-    nodeList.push_front(newNode);
-    nodeList.reverse();
+    nodeList.push_back(newNode);
   }
-  return vector<GraphNode*>(nodeList.begin(), nodeList.end());
+  return nodeList;
 }
 
 /**
