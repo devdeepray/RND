@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #include <list>
 #include <sys/time.h>
 #include "graph_node.h"
@@ -21,7 +22,7 @@ long getCurrentTime() {
  * Generated graph has O(n^2) edges and node i has edges to 
  * nodes < i.
  */
-list<GraphNode*> genGraph(int n) {
+vector<GraphNode*> genGraph(int n) {
 
   list <GraphNode*> nodeList;
   nodeList.push_back(new GraphNode(1));
@@ -29,8 +30,8 @@ list<GraphNode*> genGraph(int n) {
   for (int i = 1; i < n; ++i) {
     GraphNode* last = (*nodeList.begin());
     GraphNode* newNode = new GraphNode(i+1);
-    std::list<GraphNode*> last_neighbors = last->getNeighbors();
-    for (std::list<GraphNode*>::reverse_iterator it = last_neighbors.rbegin();
+    std::vector<GraphNode*> last_neighbors = last->getNeighbors();
+    for (std::vector<GraphNode*>::reverse_iterator it = last_neighbors.rbegin();
          it != last_neighbors.rend();
          ++it) {
       newNode->addNeighbor(*it);
@@ -39,13 +40,13 @@ list<GraphNode*> genGraph(int n) {
     nodeList.push_front(newNode);
     nodeList.reverse();
   }
-  return nodeList;
+  return vector<GraphNode*>(nodeList.begin(), nodeList.end());
 }
 
 /**
  * Free memory allocated for the graph.
  */
-void deleteGraph(list<GraphNode*> nodeList) {
+void deleteGraph(vector<GraphNode*> nodeList) {
   for (auto iter = nodeList.begin(); iter != nodeList.end(); ++iter) {
     delete (*iter);
   }
@@ -53,15 +54,27 @@ void deleteGraph(list<GraphNode*> nodeList) {
 
 int main() {
 
-  int NUM_RUNS = 1;
-  for (int size = 1000; size <= 5000; size += 100) {
-    list<GraphNode*> nodeList = genGraph(size);
+  int NUM_RUNS = 5;
+  for (int size = 1000; size <= 20000; size += 500) {
+    vector<GraphNode*> nodeList = genGraph(size);
     long start = getCurrentTime();
     for (int i = 0; i < NUM_RUNS; ++i) {
+      auto old = nodeList;
       top_sort(nodeList);
-    } 
+      nodeList = old;
+    }
+    // Uncomment to see sorted list
+    /*for (auto node : nodeList) {
+      cout << node->n << ": " ;
+      for (auto node2 : node->getNeighbors()) {
+        cout << node2->n << " " ;
+      }
+      cout << endl;
+    } */
     long end = getCurrentTime();
     deleteGraph(nodeList);
-    cout << size << "," << (double) (end - start) / NUM_RUNS << "," << endl;
+    long lsize = size;
+    long numedges = (lsize * lsize) / 4;
+    cout << numedges << "," << (double) (end - start) / NUM_RUNS << "," << endl;
   }
 }

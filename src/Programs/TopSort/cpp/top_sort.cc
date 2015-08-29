@@ -1,41 +1,39 @@
 #include "top_sort.h"
+#include <algorithm>
 
-bool top_sort(std::list<GraphNode*> &graphNodes) {
-  std::list<GraphNode*> sortedNodes;
-  std::set<GraphNode*> unmarkedNodes(graphNodes.begin(), graphNodes.end());
-  std::set<GraphNode*> seenNodes;
+bool top_sort(std::vector<GraphNode*> &graphNodes) {
 
-  while (!unmarkedNodes.empty()) {
-    GraphNode *node  = *(unmarkedNodes.begin());
-    if (!explore(node, unmarkedNodes, seenNodes, sortedNodes)) {
+  std::vector<GraphNode*> sorted;
+  for (auto node : graphNodes) {
+    if (!explore(node, sorted)) {
       return false; // Cycle was detected during DFS.
     }
   }
 
-  graphNodes = sortedNodes;
+  graphNodes = sorted;
+  for (auto node : graphNodes) {
+    node->setExplored(false);
+  }
+  reverse(graphNodes.begin(), graphNodes.end());
 }
 
-bool explore(GraphNode* node,
-             std::set<GraphNode*> &unmarkedNodes,
-             std::set<GraphNode*> &seenNodes,
-             std::list<GraphNode*> &sortedNodes) {
-  if (seenNodes.find(node) != seenNodes.end()) {
+bool explore(GraphNode* node, std::vector<GraphNode*> &sorted) {
+  if (node->getTemp()) {
     return false; // Cycle detected as we saw a back edge.
   }
-  if (unmarkedNodes.find(node) == unmarkedNodes.end()) {
+  if (node->getExplored()) {
     return true; // No need to explore neighbors, already done.
   }
 
-  seenNodes.insert(node); // Add a temporary mark.
-  std::list <GraphNode*> nbr_list = node->getNeighbors();
-  for (auto it = nbr_list.begin(); it != nbr_list.end(); ++it) {
-    if (!explore(*it, unmarkedNodes, seenNodes, sortedNodes)) {
+  node->setTemp(true); // Add a temporary mark.
+  for (auto nbr : node->getNeighbors()) {
+    if (!explore(nbr, sorted)) {
       return false; // Cycle detected.
     }
   }
 
-  seenNodes.erase(node); // Remove temporary mark.
-  unmarkedNodes.erase(node); // Add permanent mark.
-  sortedNodes.push_front(node); // Add to sorted list.
+  node->setTemp(false); // Remove temporary mark.
+  node->setExplored(true); // Add permanent mark.
+  sorted.push_back(node); // Add to sorted vector.
   return true;
 }
