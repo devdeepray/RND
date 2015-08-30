@@ -13,10 +13,14 @@ private:
 public:
   int n; // Placeholder for data to be stored in the node.
 
-  GraphNode(int _n) {
-    n = _n;
+  GraphNode() {
     explored = false;
     temp_marked = false;
+  }
+
+  GraphNode(int _n) {
+    GraphNode();
+    n = _n;
   }
 
   void addNeighbor(GraphNode* node) {
