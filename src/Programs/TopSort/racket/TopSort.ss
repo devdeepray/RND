@@ -1,44 +1,46 @@
 #lang racket
 (require racket/set)
-(provide topsort)
+(provide topsort (struct-out node) (struct-out sortres))
 
-;; Graph input is a list of lists. Each list inside has the node as car
-;; and the list of neighbors as cdr.
+
+(struct node (payload nbrs) #:transparent)
+(struct sortres (cansort sorted) #:transparent)
+;; graph is a vector of of "node"s, with each node having a payload and a vector
+;; of neighbors. 
 (define (topsort graph)
-  (topsort-helper (make-hash graph) ;; Hash the graph for quick node lookup.
+  (topsort-helper graph ;; Hash the graph for quick node lookup.
                   `() ;; Initialize list of sorted nodes.
-                  (apply set (map car graph)) ;; get the list of nodes.
-                  (set))) ;; empty set of seen nodes.
+                  (make-vector (vector-length graph) #f) ;; vector to keep track of explored nodes
+                  (make-vector (vector-length graph) #f))) ;; vector to keep track of temp marks.
 
 
 ;; Helper to pick nodes from unmarked and run dfs on it to topologically sort all nodes
 ;; reacheable from the picked node.
-(define (topsort-helper graph sorted unmarked seen)
+(define (genl n)
+  (cond [(= n 0) `()]
+        [else (cons (- n 1) (genl (- n 1)))]))
 
-  (define (explore node sorted unmarked seen)
+(define (topsort-helper graph sorted explored seen)
+  (define (explore-helper node sr)
+      (cond [(sortres-cansort sr) (explore node (sortres-sorted sr))]
+            [else sr]))
+  
+  (define (explore node sorted)
+    (cond [(vector-ref seen node) (sortres #f sorted)] ;; cycle found.
+          [(vector-ref explored node) (sortres #t sorted)] ;; Already explored.
+          [else (begin
+                  (vector-set! seen node #t)
+                  (define sr (foldl explore-helper
+                                    (sortres #t sorted)
+                                    (node-nbrs (vector-ref graph node))))
+                  (vector-set! seen node #f)
+                  (vector-set! explored node #t)
+                  (sortres (sortres-cansort sr)
+                           (cons node (sortres-sorted sr))))]))
+  
+  (let ([sr (foldl explore-helper
+                   (sortres #t `())
+                   (genl (vector-length graph)))])
+    sr))
 
-    (define (explore-helper node retval)
-      (cond [(car retval) (explore node (cadr retval) (caddr retval) (cadddr retval))]
-            [else retval]))
-
-    (cond [(set-member? seen node) (list #f sorted unmarked seen)] ;; cycle found.
-          [(not (set-member? unmarked node)) (list #t sorted unmarked seen)] ;; Already explored.
-          [else (let* ([tmp-seen (set-add seen node)]
-                       [retval (foldl explore-helper 
-                                      (list #t sorted unmarked tmp-seen) 
-                                      (hash-ref graph node))] ;; Explore all neighbors.
-                       [sorted-new (cons node (cadr retval))]
-                       [unmarked-new (set-remove (caddr retval) node)]
-                       [seen-new (set-remove (cadddr retval) node)])
-                  (list (car retval) sorted-new unmarked-new seen-new))]))
-
-  (cond [(set-empty? unmarked) (cons sorted #t)] ;; no more nodes.
-        [else (let* ([node (set-first unmarked)] ;; pick some node.
-                     [retval (explore node sorted unmarked seen)] ;; Run dfs.
-                     [is-cycle (not (car retval))]
-                     [sorted-new (cadr retval)]
-                     [unmarked-new (caddr retval)]
-                     [seen-new (cadddr retval)])
-                (cond [is-cycle (cons sorted #f)] ;; Cannot do topSort.
-                      [else (topsort-helper graph sorted-new unmarked-new seen-new)]))]))
-
+                 

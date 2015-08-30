@@ -24,8 +24,8 @@ long getCurrentTime() {
  */
 vector<GraphNode*> genGraph(int n) {
 
-  vector <GraphNode*> nodeList;
-  nodeList.push_back(new GraphNode(0));
+  vector <GraphNode*> nodeList(n);
+  nodeList[0] = new GraphNode(0);
 
   for (int i = 1; i < n; ++i) {
     GraphNode* last = nodeList[i - 1];
@@ -37,7 +37,7 @@ vector<GraphNode*> genGraph(int n) {
       newNode->addNeighbor(*it);
     }
     newNode->addNeighbor(last);
-    nodeList.push_back(newNode);
+    nodeList[i] = newNode;
   }
   return nodeList;
 }
@@ -53,8 +53,9 @@ void deleteGraph(vector<GraphNode*> nodeList) {
 
 int main() {
 
-  int NUM_RUNS = 5;
-  for (int size = 1000; size <= 20000; size += 500) {
+  int NUM_RUNS = 1;
+  for (int size = 1000; size <= 10000; size += 200) {
+
     vector<GraphNode*> nodeList = genGraph(size);
     long start = getCurrentTime();
     for (int i = 0; i < NUM_RUNS; ++i) {

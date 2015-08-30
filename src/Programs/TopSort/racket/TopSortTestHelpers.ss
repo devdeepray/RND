@@ -1,11 +1,15 @@
 #lang racket
-(require "../../../Infrastructure/SpeedTest.ss")
+(require "../../../Infrastructure/SpeedTest.ss" "TopSort.ss")
 (provide gen-big-dag test)
 
 (define (gen-big-dag n)
-  (cond [(= n 1) `((1))]
-        [else (let ([smaller-dag (gen-big-dag (- n 1))])
-                (reverse (cons (cons n (reverse (car smaller-dag))) smaller-dag)))]))
+  (define (helper n)
+    (cond [(= n 1) (list (node 0 `()))]
+          [else (let* ([smaller-dag (helper (- n 1))]
+                      [old-nbr (node-nbrs (car smaller-dag))]
+                      [new-nbr (cons (- n 2) old-nbr)])
+                  (cons (node 0 new-nbr) smaller-dag))]))
+  (list->vector (reverse (helper n))))
 
 
 (define (test start-dag end-dag delta num-run sorter)
@@ -14,7 +18,7 @@
           [else (let ([big-dag (gen-big-dag dag-size)])
                   (begin (define (func)
                            (sorter big-dag))
-                         (display dag-size)
+                         (display (/ (* dag-size dag-size) 4))
                          (display ",")
                          (collect-garbage)
                          (display (perf-test func num-run))
