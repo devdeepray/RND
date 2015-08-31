@@ -11,7 +11,6 @@
                   (cons (node 0 new-nbr) smaller-dag))]))
   (list->vector (reverse (helper n))))
 
-
 (define (test start-dag end-dag delta num-run sorter)
   (define (test-helper dag-size)
     (cond [(> dag-size end-dag) 0]
