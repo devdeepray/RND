@@ -1,55 +1,73 @@
 module TopSort(topsort) where
 
--- Import the Map data structure. This is needed for quick lookup
--- of neighbors of a given node. It is immutable.
-import Data.Map (Map)
-import qualified Data.Map as Map
+import Data.Array.IArray
+import Data.Ix
+import Data.Array.ST
+import Control.Monad.ST
 
--- Import the Set data structure. This is needed for keeping track
--- of the nodes to be explored, the temp marked nodes, etc. It is
--- immutable.
-import Data.Set (Set)
-import qualified Data.Set as Set
+-- Representation of a graph as a table of vertices
+type Vertex = Integer
+type Table a = Array Vertex a
+type Graph =  Table [Vertex]
 
--- A data structure for the result of exploration of a node.
-data ExploreRes a = ExploreRes {
-  getCansort :: Bool, -- Whether the graph can be sorted.
-  getSorted :: [a], -- The sorted list.
-  getUnmarked :: Set a, -- The list of unmarked nodes so far.
-  getSeen :: Set a -- The list of seen nodes so far.
-} deriving (Show)
+type Bounds = (Vertex, Vertex)
 
+data Tree a = Node a (Forest a)
+type Forest a= [Tree a]
 
--- graph is a list of pairs, where each pair is (node num, (list of neighbor nodes))
-topsort :: Ord a => [(a, [a])] -> ([a], Bool)
-topsort graph =
-  topsort_helper (Map.fromList graph) [] (Set.fromList (map fst graph))
+-- This function is to generate a tree from a node in the graph.
+-- This can potentially be an infinite tree if there are loops.
+generate :: Graph -> Vertex -> Tree Vertex
+generate g v = Node v (map (generate g) (g!v))
 
-topsort_helper :: Ord a => Map a [a] -> [a] -> Set a -> ([a], Bool)
-topsort_helper graph sorted unmarked
-  | Set.null unmarked = (sorted, True) -- Finished, no more nodes
-  | not (getCansort explore_res) = (sorted, False) -- Cannot perform sort, cycle present
-  | otherwise = topsort_helper graph
-      (getSorted explore_res) -- The sorted nodes after call to explore
-      (getUnmarked explore_res) -- The unmarked nodes after call to explore
-  where   -- Pick one node from unmarked and explore it.
-    explore_res = explore graph (Set.findMin unmarked) sorted unmarked Set.empty
+type Set s = STArray s Vertex Bool
 
--- Run DFS on a node and sort the induced subgraph.
-explore :: Ord a => Map a [a] -> a -> [a] -> Set a -> Set a -> ExploreRes a
-explore graph node sorted unmarked seen
-  | Set.member node seen = ExploreRes False sorted unmarked seen -- Cycle found.
-  | Set.notMember node unmarked = ExploreRes True sorted unmarked seen -- Already explored, skip.
-  | otherwise =  ExploreRes (getCansort explore_res) -- Result of exploring all neighbors.
-                     (node : (getSorted explore_res)) -- Add node to sorted list.
-                     (Set.delete node (getUnmarked explore_res)) -- Delete from unmarked
-                     (Set.delete node (getSeen explore_res)) -- Remove temp mark.
-  where -- Explore all the neighbors
-    explore_res = foldl explore_helper
-                    (ExploreRes True sorted unmarked (Set.insert node seen))
-                    (Map.findWithDefault [] node graph)
-      where
-        explore_helper exp_h_res node
-           | getCansort exp_h_res = explore graph node (getSorted exp_h_res)
-               (getUnmarked exp_h_res) (getSeen exp_h_res)
-           | otherwise = exp_h_res
+mkEmpty :: Bounds -> ST a (Set a)
+mkEmpty bounds = newArray bounds False
+
+contains :: (Set a) -> Vertex -> ST a Bool
+contains s v = readArray s v
+
+include :: (Set a) -> Vertex -> ST a ()
+include s v = writeArray s v True
+
+prune :: Bounds -> Forest Vertex -> Forest Vertex
+prune bnds trees
+  = runST (do
+      m <- mkEmpty bnds
+      chop m trees)
+
+chop :: Set a -> Forest Vertex -> ST a (Forest Vertex)
+chop m [] = return []
+chop m ((Node v subtr) : res)
+  = do
+      visited <- contains m v
+      if visited then
+        chop m res
+      else do
+        _ <- include m v
+        ct <- chop m subtr
+        cr <- chop m res
+        return ((Node v ct) : cr)
+
+postordTr :: Tree a -> [a]
+postordTr (Node v f) = (postordFr f) ++ [v]
+
+postordFr :: Forest a -> [a]
+postordFr f = concat (map postordTr f)
+
+postOrd :: Graph -> [Vertex]
+postOrd g = postordFr (dfforest g)
+
+topsort :: Graph -> [Vertex]
+topsort g = reverse (postOrd g)
+
+dfs :: Graph -> [Vertex] -> Forest Vertex
+dfs g vs = prune (bounds g) (map (generate g) vs)
+
+dfforest :: Graph -> Forest Vertex
+dfforest g = dfs g (vertices g)
+
+vertices :: Graph -> [Vertex]
+vertices = indices
+

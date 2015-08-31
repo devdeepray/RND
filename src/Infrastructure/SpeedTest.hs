@@ -6,13 +6,13 @@ import Control.DeepSeq
 
 getCPUTimeMS = round `fmap` (fmap (* 1000) getPOSIXTime)
 
-benchmark :: [Integer] -> IO Integer
+benchmark :: Integer -> IO Integer
 benchmark f = do
                start <- getCPUTimeMS
                end <- (f `deepseq` getCPUTimeMS)
                return (end - start)
 
-perf_test :: [Integer] -> Integer -> Double
+perf_test :: Integer -> Integer -> Double
 perf_test func num_runs =
   (perf_helper num_runs 0) / (fromIntegral num_runs)
   where
