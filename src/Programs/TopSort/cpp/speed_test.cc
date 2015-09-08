@@ -31,8 +31,8 @@ vector<GraphNode*> genGraph(int n) {
     GraphNode* last = nodeList[i - 1];
     GraphNode* newNode = new GraphNode(i);
     std::vector<GraphNode*> last_neighbors = last->getNeighbors();
-    for (auto it = last_neighbors.rbegin();
-         it != last_neighbors.rend();
+    for (auto it = last_neighbors.begin();
+         it != last_neighbors.end();
          ++it) {
       newNode->addNeighbor(*it);
     }

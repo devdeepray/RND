@@ -26,6 +26,12 @@ bool explore(GraphNode* node, std::vector<GraphNode*> &sorted) {
   }
 
   node->setTemp(true); // Add a temporary mark.
+//  const std::vector<GraphNode*> &tmp = node->getNeighbors(); // Leads to slow down
+//  for (int i = 0; i < tmp.size(); ++i) {
+//    if (!explore(tmp[i], sorted)) {
+//      return false;
+//    }
+//  }
   for (auto nbr : node->getNeighbors()) {
     if (!explore(nbr, sorted)) {
       return false; // Cycle detected.
