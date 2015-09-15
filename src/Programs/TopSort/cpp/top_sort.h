@@ -2,7 +2,6 @@
 #define _TOP_SORT_H_
 
 #include <vector>
-#include <set>
 #include "graph_node.h"
 
 /**

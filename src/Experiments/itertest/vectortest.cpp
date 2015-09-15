@@ -12,17 +12,29 @@ long getCurrentTimeUS() {
   return us;
 }
 
+struct tmp {
+  int x;
+  int y;
+  int z;
+};
+
 int main() {
 
   // Test for array on the stack
   int arr[2048]; // fits in cache on AMD FX6300
-  
+  for (int n = 0; n < 1000; ++n) {
+  for (int i = 0; i < 2048; ++i) {
+    arr[i] = i; // FOrce into cache.
+  }
+  }
   // Test case 1: basic iteration idiom with for loop
   long total_time = 0;
   for (int c = 0; c < 100; ++c) {
+    int k = 0;
     total_time -= getCurrentTimeUS();
     for (int i = 0; i < 2048; ++i) {
-      arr[i] = i;
+      arr[i] = k;
+      ++k;
     }
     total_time += getCurrentTimeUS();
   }
@@ -31,11 +43,13 @@ int main() {
   // Test case 2: iteration with pointer
   total_time = 0;
   for (int c = 0; c < 100; ++c) {
-    int *ptr = arr;
+    int *ptr;
+    int *lim = arr + 2048;
+    int k = 0;
     total_time -= getCurrentTimeUS();
-    for (int i = 0; i < 2048; ++i) {
-      *ptr = i;
-      ptr++;
+    for (int *ptr = arr; ptr < lim; ++ptr) {
+      *ptr = k;
+      ++k;
     }
     total_time += getCurrentTimeUS();
   }
@@ -43,11 +57,19 @@ int main() {
 
   // Test case 3: iteration on vector
   vector<int> varr(2048);
+  for (int n = 0; n < 1000; ++n) {
+  for (int i = 0; i < 2048; ++i) {
+    varr[i] = i; // FOrce into cache.
+  }
+  }
+
   total_time = 0;
   for (int c = 0; c < 100; ++c) {
+    int k = 0;
     total_time -= getCurrentTimeUS();
     for (int i = 0; i < 2048; ++i) {
-      varr[i] = i;
+      varr[i] = k;
+      ++k;
     }
     total_time += getCurrentTimeUS();
   }
@@ -57,10 +79,10 @@ int main() {
   total_time = 0;
   for (int c = 0; c < 100; ++c) {
     total_time -= getCurrentTimeUS();
-    int i = 0;
+    int k = 0;
     for (auto &it : varr) {
-      it = i;
-      ++i;
+      it = k;
+      ++k;
     }
     total_time += getCurrentTimeUS();
   }

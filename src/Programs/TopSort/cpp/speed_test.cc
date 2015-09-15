@@ -14,7 +14,7 @@ using namespace std;
 long getCurrentTime() {
   struct timeval tp;
   gettimeofday(&tp, NULL);
-  long int us = tp.tv_sec * 1000000 + tp.tv_usec;
+  long int us = tp.tv_sec * 1000 + tp.tv_usec / 1000;
   return us;
 }
 
@@ -112,7 +112,7 @@ int main() {
       cout << endl;
     }*/
     long end = getCurrentTime();
-    long numedges = size * 11;
+    long numedges = size * 500;
     cout << numedges << "," << (double) (end - start) / NUM_RUNS << "," << endl;
   }
 
