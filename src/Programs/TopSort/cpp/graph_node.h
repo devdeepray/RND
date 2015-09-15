@@ -19,6 +19,10 @@ public:
     temp_marked = false;
   }
 
+  GraphNode() {
+    GraphNode(0);
+  }
+
   void addNeighbor(GraphNode* node) {
     neighbors.push_back(node);
   }

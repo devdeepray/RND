@@ -1,18 +1,24 @@
 #include "top_sort.h"
 #include <algorithm>
 
+void restoreFlags(std::vector<GraphNode*> &graphNodes) {
+  for(auto node : graphNodes) {
+    node->setExplored(false);
+    node->setTemp(false);
+  }
+}
+
 std::vector<GraphNode*> top_sort(std::vector<GraphNode*> &graphNodes) {
 
   std::vector<GraphNode*> sorted;
   for (auto node : graphNodes) {
     if (!explore(node, sorted)) {
+      restoreFlags(graphNodes);
       return std::vector<GraphNode*>(); // Cycle was detected during DFS.
     }
   }
 
-  for (auto node : graphNodes) {
-    node->setExplored(false);
-  }
+  restoreFlags(graphNodes);
   reverse(sorted.begin(), sorted.end());
   return sorted;
 }

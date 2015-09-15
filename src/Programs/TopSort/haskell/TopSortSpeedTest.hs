@@ -16,23 +16,34 @@ gen_big_dagh n = ((n - 1), new_nbrs) : smaller_dag
   where
   smaller_dag = gen_big_dagh (n - 1)
   new_nbrs = (n - 2) : (snd (head smaller_dag))
-
 gen_big_dag n = array (0, n-1) (gen_big_dagh n)
 
-test start_dag end_dag delta num_run sorter_func =
+gen_sparse_dagh :: Integer -> Integer -> [(Integer, [Integer])]
+gen_sparse_dagh 1 deg = [(0, [])]
+gen_sparse_dagh n deg = ((n - 1), new_nbrs) : smaller_dag
+  where
+  smaller_dag = gen_sparse_dagh (n - 1) deg
+  new_nbrs = [(max 0 ((n - 2)-deg))..(n-2)]
+
+gen_sparse_dag n deg = array (0, n-1) (gen_sparse_dagh n deg)
+
+test gen start_dag end_dag delta num_run sorter_func =
  test_helper start_dag
  where
  test_helper dag_size
   | dag_size > end_dag = putStr "done"
   | otherwise =
-     let big_dag = gen_big_dag dag_size in
      do
       putStr (show dag_size)
       putStr ","
-      putStr (show (perf_test (head (topsort big_dag)) num_run))
+      putStr (show (perf_test (head (topsort (gen dag_size))) num_run))
       putStrLn ","
       (test_helper (dag_size + delta))
 
 main = do
- test 1000 10000 200 1 topsort
+ putStr "[DENSE]"
+ x <- test gen_big_dag 1000 10000 200 1 topsort
+ putStr "[SPARSE]"
+ test (\sz -> gen_sparse_dag sz 500) 1000 10000 200 1 topsort
+ 
 
