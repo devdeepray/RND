@@ -1,0 +1,1 @@
+Taken from rosetta. Does something similar to cppv2. Does not use a queue, but uses the prolog select clause

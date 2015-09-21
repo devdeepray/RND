@@ -1,0 +1,1 @@
+C++ version which builds the solution row by row. A new queen is added at each place and validity is tested and then we recurse.
