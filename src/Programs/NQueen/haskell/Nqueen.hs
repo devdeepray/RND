@@ -1,5 +1,7 @@
 module Nqueen(nqueen) where
 
+import Data.List
+
 type Solution = [Integer]
 
 nqueen :: Integer -> [Solution]
@@ -18,8 +20,3 @@ isvalid d x y
 validate :: [Solution] -> [Solution]
 validate l = filter (\x -> (isvalid 1 (head x) (tail x))) l
 
-delete :: (Eq a) => a -> [a] -> [a]
-delete v [] = []
-delete v l
-  | v == (head l) = delete v (tail l)
-  | otherwise = (head l):(delete v (tail l))
