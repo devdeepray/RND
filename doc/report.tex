@@ -1,0 +1,329 @@
+ss[a4paper]{article}
+\usepackage[a4paper, total={7in, 10in}]{geometry}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+
+\title{A comparison of programming paradigms}
+
+\author{Devdeep Ray}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Programming languages have evolved a lot over the last decade. This is an attempt 
+to compare a select few and see where and when it is appropriate to choose a
+language over the other possible choices. We focus on C, C++, DrRacket, Haskell 
+and Prolog. We look at performance aspects, ease of development and clarity of 
+code.
+\end{abstract}
+
+\section{Introduction}
+As programs become larger and more involved, program design becomes very important.
+Programs must be easy to understand and maintain so that it remains fresh. A lot of
+people have spent a lot of time trying to fix bugs, make changes and pull up to
+date lines and lines of old legacy code. Also, in this era of fast growing start-ups
+and ever changing technology scene, development must be fast and efficient and it
+should be easy to collaborate. Performance of code is also a concern which must be 
+addressed. It is true that machines have become 100s of times faster than what they 
+were a few decades ago, but it will still be economical if the code runs faster, 
+because it would mean less hardware and less number of complicated things need 
+to be done to make the program run at a larger scale. This makes choice of language
+in a project a very critical decision. We look at a few programming languages that
+span different paradigms and do a comparison of some aspects.
+
+\section{Choice of languages for comparison}
+We mainly look at C, C++, Haskell, DrRacket and Prolog. All of these languages support
+separation of code into multiple files to aid modular programming and source code 
+organization. All of these also have open source implementations, namly gcc for 
+C and C++, ghc for haskell, raco for DrRacket and swi-prolog for Prolog.
+
+\subsection{C} 
+C is an imperative programming language. It is the baseline for performance
+benchmarks. It is one of the fastest languages and the compiler is sufficiently
+developed. It gives access to various low level semantics that can be used to
+perform micro-optimizations, though the gcc compiler's automatic optimization 
+techniques have made a lot of micro-optimizations obsolete. Basic data structures
+provided by the language are the record data structure and arrays. It supports 
+pointers to deal with references.
+
+\subsection{C++}
+C++ is also an imperative language along with various object oriented features. 
+It has evolved from C, inheriting most features of C and adding various object 
+oriented features into the language. C++ supports classes and constructors, 
+and has a standard library of various containers which make it very convenient
+to implement various algorithms. The containers include but are not limited 
+to lists, dynamic arrays, stacks, queues, sets and maps. These libraries are
+templated, which makes it very easy to use with different types of data types
+and also makes it easy to write generic algorithms. It is important to see 
+how using say vectors, instead of C arrays impacts the speed of a program. If
+the impact is not huge, one can always use vectors instead of arrays because
+of the convenience functions they provide. 
+
+\subsection{Haskell}
+Haskell is a strongly typed lazy functional programming language. This means
+that there are no side effects in pure haskell. Haskell does support side 
+effects through a language extension called monads. Monads are useful when 
+we want to have side effects for performance or for performing IO. Monads 
+are a very clever way of keeping the non functional part of the program 
+separate and clearly visible. For example, a function which uses the IO 
+monad, will have a return value which is in the IO monad. A pure function 
+can be used to process a value in the IO monad, but the return value will 
+also be tagged as IO monad. This is how using monads separates the pure part
+from the impure part in haskell. Laziness in haskell helps in improving 
+performance and it can also be exploited during programming. For example, it
+is fairly straightforward to generate say, a list of all primes by applying 
+a primality check to the infinite list of natural numbers. Since the language
+is lazy, it will only do the primality check on the required number of 
+natural numbers to get, say, the $i^{th}$ prime. It also caches evaluations 
+so that it need not do them again and again. This is possible because of its
+pure functional nature. Haskell is also a strongly typed language with an 
+advanced type classing system. This makes the language less error prone because
+type errors are caught during compile time. %% paper citation
+Haskell can be interpreted or compiled. The ghc compiler can compile haskell 
+to target code. ghci is a command line interpreter for haskell.
+
+\subsection{DrRacket}
+DrRacket is a multi-paradigm programming language that is derived from the
+scheme/lisp family. It can be used to do functional programming with support
+for higher order functions and the standard features of functional languages, 
+and it also supports side effects and object oriented programming. It is a
+weakly typed programming language, which means programmers can stop worrying 
+about types. This can increase productivity and improve prototyping speed
+in a significant number of cases. %%Paper citation
+The racket compiler compiles programs to byte code to run on a JIT
+compilation system.
+
+\subsection{Prolog}
+Prolog is a logic programming language. It is a declarative language. The 
+program logic needs to be specified using facts and rules. It employs back 
+tracking to solve problems. It is very useful in rule based AI and expert 
+systems, and to solve certain types of problems that require backtracking, 
+like puzzles. Prolog is a declarative language. 
+
+\section{Programs}
+\subsection{Topological sort}
+In this first comparison, we write topological sort in C, C++, Haskell and 
+DrRacket. Prolog is left out of the list because it it does not lend itself 
+well to this, though it can be done. In all the cases, we make the assumption
+that the graph nodes are indexed by an integer from 1 to N, where N is the 
+number of nodes. This requirement is not necessary, but if we dont have this,
+it adds a log(N) or a hash  multiplicative overhead to the O(N) algorithm if
+we don't have pointers, because we need to look up the node from its id. In
+all the programming languages, the idea is to do a depth first search, 
+looking for back edges. If a back edge is found, the graph cannot have a 
+sorted order, otherwise, we find the sorted order, which is the reverse 
+order in which DFS finishes. 
+\subsubsection{C++}
+We structure the graph's nodes in the following way
+
+\begin{lstlisting}[language=c++]
+/**
+ * Class representing a node in a directed graph.
+ */
+class GraphNode {
+private:
+  std::vector<GraphNode*> neighbors;
+  int ind;
+public:
+  int n; // Placeholder for data to be stored in the node.
+
+  GraphNode(int _ind) {
+    ind = _ind;
+  }
+
+  GraphNode() {
+    GraphNode(0);
+  }
+
+  void addNeighbor(GraphNode* node) {
+    neighbors.push_back(node);
+  }
+
+  std::vector<GraphNode*> getNeighbors() {
+    return neighbors;
+  }
+  
+  int getInd() {
+    return ind;
+  }
+};
+\end{lstlisting}
+This is a simple design that gives us the freedom of choosing how we
+actually allocate the nodes in memory (contiguous or non contiguous).
+Also, vectors were chosen because the setup of adjacency lists will be 
+done once, and then we will just be accessing them. Hence, vectors are 
+a better choice than lists. \verb+ind+ is the index of the node and it 
+is assumed that each node has a unique value that lies between 0 and 
+N-1, where N is the number of nodes. This helps us to keep track of 
+nodes using a simple array instead of a hash or set, which makes the
+program faster. This code is put into a header file \verb+graph_node.h+.
+We now define the interface for the topological sort algorithm in a 
+header \verb+topsort.h+. This looks like this
+\begin{lstlisting}[language=c++]
+#include <vector>
+#include "graph_node.h"
+
+/**
+ * Takes in a vector of nodes in the graph and topologically sorts
+ * the vector of nodes, returning a list of integers in the sorted order.
+ * Returns empty list if topsort not possible.
+ */
+std::vector<GraphNode*> top_sort(const std::vector<GraphNode*> &graphNodes);
+\end{lstlisting}
+There are a couple of things to note here. Note that input is a reference 
+to a vector of \verb+GraphNode*+ as opposed to a reference to a vector of 
+\verb+GraphNode+. This again allows the code to be agnostic of where or how
+the nodes were allocated. Also, note that we need to have something like 
+returning an empty list if the graph could not be sorted. We could have
+alternatively taken a boolean argument by reference and set it to true or
+false, or some other arrangement like returning a pair, but both of these 
+are quite ugly. Now let us look at the code for topological sort. This is
+written in \verb+topsort.cpp+. 
+
+\begin{lstlisting}[language=c++]
+std::vector<GraphNode*> top_sort(const std::vector<GraphNode*> &graphNodes) {
+
+  std::vector<GraphNode*> sorted;
+  std::vector<bool> tempMarked(graphNodes.size(), false), seen(graphNodes.size(), false);
+  for (auto node : graphNodes) {
+    if (!explore(node, sorted, tempMarked, seen)) {
+      return std::vector<GraphNode*>(); // Cycle was detected during DFS.
+    }
+  }
+
+  reverse(sorted.begin(), sorted.end());
+  return sorted;
+}
+\end{lstlisting}
+The \verb+explore+ function does DFS on the node passed to it, and if it 
+finds a cycle/back-edge, it returns false. It also populates the \verb+sorted+ 
+vector as the DFS finishes. Lets look at the definition of \verb+explore+.
+
+\begin{lstlisting}[language=c++]
+bool explore(GraphNode* node, std::vector<GraphNode*> &sorted,
+             std::vector<bool> &tempMarked, std::vector<bool> &seen) {
+  int nodeInd = node->getInd();
+  if (tempMarked[nodeInd]) {
+    return false; // Cycle detected as we saw a back edge.
+  }
+  if (seen[nodeInd]) {
+    return true; // No need to explore neighbors, already done.
+  }
+
+  tempMarked[nodeInd] = true; // Add a temporary mark.
+  for (auto nbr : node->getNeighbors()) {
+    if (!explore(nbr, sorted, tempMarked, seen)) {
+      return false; // Cycle detected.
+    }
+  }
+
+  tempMarked[nodeInd] = false; // Remove temporary mark.
+  seen[nodeInd] = true; // Add permanent mark.
+  sorted.push_back(node); // Add to sorted vector.
+  return true;
+}
+\end{lstlisting}
+That finishes the implementation. A simple analysis will show that the run 
+time of the implementation is $O(E + V)$ where $E$ is the number of edges
+and $V$ is the number of vertices. This is indeed the algorithm's run time as well. 
+
+\subsection{C}
+The C implementation is similar to the C++ implementation. The differences 
+are that we use C arrays instead of vectors and we cannot use classes, only
+structs. We still use bool instead of int variables (as in pure C), it just 
+makes things cleaner. Here is \verb+graph_node.h+.
+\begin{lstlisting}[language=c++]
+struct GraphNode {
+  int n; // Placeholder for data
+  int ind;
+  int numnbrs; // Number of neighbors
+  GraphNode** nbrs;
+};
+\end{lstlisting}
+Right from here, we start seeing differences between the C++ implementation
+and C implementation. All members of the struct are by default, public and 
+there is no access control. There are no constructors. We have to store the
+number of neighbors. This is a common difference between using arrays and
+vectors. Size information needs to be maintained manually for arrays allocated
+on the heap. The \verb+sizeof+ operator is a compile time macro, and hence 
+it will not work for heap allocations. Here is \verb+topsort.h+.
+\begin{lstlisting}[language=c++]
+#include "graph_node.h"
+
+bool top_sort(int size, GraphNode** nodes, GraphNode** sorted);
+\end{lstlisting}
+Note the common pattern of having the size along with each array. This makes 
+function signatures bigger. Also, note that since the sorted list is reference
+parameter, we can and must return an indication of whether we could sort it 
+or not. We choose to return true if it could be sorted, and false otherwise.
+Here is the full implementation of \verb+top_sort+.
+\begin{lstlisting}[language=c++]
+bool top_sort(int size, GraphNode** nodes, GraphNode** sorted) {
+
+  int curindex = 0; // Index of sorted node position
+  bool *tempMarked = malloc(size * sizeof(bool));
+  bool *seen = malloc(size * sizeof(bool));
+  for (int i = 0; i < size; ++i) {
+    tempMarked[i] = false;
+    seen[i] = false;
+  }
+  for (int i = 0; i < size; ++i) {
+    if (!explore(nodes[i], sorted, &curindex, tempMarked, seen)) {
+      free(nodes); // Quick return needs freeing.
+      free(sorted);
+      return false;
+    }
+  }
+  // Reverse the nodes.
+  for (int i = 0; i < size / 2; ++i) {
+	GraphNode* tmp = sorted[i];
+	sorted[i] = sorted[size - i - 1];
+	sorted[size - i - 1] = tmp;
+  }
+  free(nodes);
+  free(sorted);
+  return true;
+}
+\end{lstlisting}
+One of the important consequences of programming in C where arrays are used frequently is 
+the use of malloc for almost all array allocations. It is very rare that we know the size 
+of the array during compile time. The programmer must be very careful to free all allocations. 
+It is often that short circuiting is done by the programmer (for example, a quick return) 
+and one should be careful about freeing resources at every such place. Finally, here is the
+implementation of \verb+explore+.
+\begin{lstlisting}[language=c++]
+bool explore(GraphNode* node, GraphNode** sorted, int* index, bool* tempMarked, bool* seen) {
+  int nodeInd = node->ind;
+  if (tempMarked[nodeInd]) {
+    return false; // Cycle detected as we saw a back edge.
+  }
+  if (seen[nodeInd]) {
+    return true; // No need to explore neighbors, already done.
+  }
+
+  tempMarked[nodeInd] = true; // Add a temporary mark.
+  
+  GraphNode** nbrs = node->nbrs;
+  for (int i = 0; i < node->numnbrs; ++i) {
+    if (!explore(nbrs[i], sorted, index, tempMarked, seen)) {
+      return false; // Cycle detected.
+    }
+  }
+
+  tempMarked[nodeInd] = false;; // Remove temporary mark.
+  seen[nodeInd] = true; // Add permanent mark.
+  sorted[*index] = node; // Add to sorted vector.
+  ++(*index);
+  return true;
+}
+\end{lstlisting}
+It is clear that although the C version does pretty much what the C++ version does, there
+is some amount of code bloat and sacrifice of readability. What we want to know is 
+whether it was worth it to do so in terms of performance of the code. 
+\end{document}
