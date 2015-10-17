@@ -1,4 +1,4 @@
-#include "defs.h"
+#include <defs.h>
 
 Event::Event(InputTerminal _affected_input, float _timestamp, bool _new_val) {
 	affected_input = _affected_input;
@@ -13,9 +13,9 @@ bool Event::operator<(const Event &e2) const {
 	return timestamp > e2.timestamp;
 }
 
-InputTerminal::InputTerminal(Component* _component, string _input_id) {
+InputTerminal::InputTerminal(Component* _component, int _input_index) {
 	component = _component;
-	input_id = _input_id;
+	input_index = _input_index;
 }
 
 InputTerminal::InputTerminal() {

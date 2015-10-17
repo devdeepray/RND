@@ -1,7 +1,7 @@
 #ifndef _DEFS_H_
 #define _DEFS_H_
 
-#include "component.h"
+#include <component.h>
 #include <iostream>
 using namespace std;
 
@@ -9,9 +9,9 @@ struct Component;
 
 struct InputTerminal {
 	Component* component;
-	string input_id;
-	
-	InputTerminal(Component* _component, string _input_id);
+	int input_index;
+
+	InputTerminal(Component* _component, int _input_index);
 	InputTerminal();
 };
 
