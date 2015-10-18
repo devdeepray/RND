@@ -1,5 +1,5 @@
-#ifndef _TWOINPUT_H_
-#define _TWOINPUT_H_
+#ifndef _NOTGATE_H_
+#define _NOTGATE_H_
 
 #include <component.h>
 #include <defs.h>
@@ -7,19 +7,15 @@
 #include <iostream>
 using namespace std;
 
-class TwoInput : private Component {
-protected:
-  TwoInput();
+class NotGate : private Component {
 public:
-  InputTerminal input1();
-  InputTerminal input2();
+	NotGate();
+  InputTerminal input();
   using Component::connect;
   void connect(InputTerminal input_terminal);
   using Component::get_output;
   vector<bool> get_output(vector<bool> input);
-protected:
-  virtual bool get_output(bool val1, bool val2);
 };
 
 
-#endif // _TWOINPUT_H_
+#endif // _NOTGATE_H_

@@ -1,5 +1,6 @@
 #include <component.h>
 #include <andgate.h>
+#include <notgate.h>
 #include <defs.h>
 #include <queue>
 #include <vector>
@@ -8,8 +9,11 @@ using namespace std;
 
 int main() {
 	AndGate g1, g2, g3;
+	NotGate g4, g5;
 	g1.connect(g3.input1());
 	g2.connect(g3.input2());
+	g3.connect(g4.input());
+	g4.connect(g5.input());
 	priority_queue<Event> pq;
 
 	pq.push(Event(g1.input1(), 0, true));
