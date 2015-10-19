@@ -1,3 +1,6 @@
+#ifndef _RINGOSCILLATOR_H_
+#define _RINGOSCILLATOR_H_
+
 #include <notgate.h>
 #include <defs.h>
 
@@ -8,3 +11,5 @@ public:
 	void connect(InputTerminal input);
 	InputTerminal input();
 };
+
+#endif // _RINGOSCILLATOR_H_
