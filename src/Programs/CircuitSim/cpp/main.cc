@@ -30,7 +30,7 @@ int main() {
 	events.push_back(Event(g2.input2(), 0.5, true));
 
 	Simulator sim(inputs);
-	sim.simulate(events);
+	sim.simulate(events, 10);
 	for (auto v : probe.get_probe_data()) {
 		cout << v.first << " " << v.second << endl;
 	}

@@ -5,7 +5,7 @@ void Simulator::simulate(vector<Event> events, float max_t) {
 		pq.push(event);
 	}
 	cerr << "starting simulation..." << endl;
-	while (!pq.empty() || pq.top().timestamp > max_t) {
+	while (!pq.empty() && pq.top().timestamp < max_t) {
 		Event ev = pq.top();
 		cout << "ev: " << ev.affected_input.input_index << " " << ev.new_val << " " << ev.timestamp << endl;
 		pq.pop();
