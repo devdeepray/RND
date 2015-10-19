@@ -8,6 +8,11 @@ InputTerminal Probe::input() {
 }
 
 vector<Event> Probe::trigger_change(int input_index, bool val, float cur_time) {
-	probe_data.push_back(pair<bool, float>(val, cur_time));
+	cout << "Probe trigger" << endl;
+	probe_data.push_back(pair<float, bool>(cur_time, val));
 	return vector<Event>();
+}
+
+vector<pair<float, bool> > Probe::get_probe_data() {
+	return probe_data;
 }

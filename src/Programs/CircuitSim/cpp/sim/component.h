@@ -20,7 +20,7 @@ protected:
 public:
   virtual vector<bool> get_output(vector<bool> input);
 
-  vector<Event> trigger_change(int input_index, bool val, float cur_time);
+  virtual vector<Event> trigger_change(int input_index, bool val, float cur_time);
 
 	void connect(int output_index, InputTerminal input_terminal);
 

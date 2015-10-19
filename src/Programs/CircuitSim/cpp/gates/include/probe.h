@@ -13,6 +13,8 @@ public:
 	Probe();
   InputTerminal input();
   vector<Event> trigger_change(int input_index, bool val, float cur_time);
+	vector<pair<float, bool> > get_probe_data();
+	void clear_probe();
 };
 
 

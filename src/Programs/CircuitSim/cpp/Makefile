@@ -1,4 +1,4 @@
 build:
-	g++ -std=c++0x -I gates -I sim *.cc gates/*.cc sim/*.cc -o csim
+	g++ -std=c++0x -I gates/include -I sim *.cc gates/src/*.cc sim/*.cc -o csim
 clean:
 	rm *.o csim
