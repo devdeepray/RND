@@ -3,23 +3,30 @@ import Data.List
 
 type InputId = Int
 type Event = (Double, Bool)
-type EventSequence = [Event]
-type LogicFunction = [Bool] -> Bool
-type GateState = [Bool]
-type Element = GateState -> [EventSequence] -> EventSequence
-type Component = GateState -> [EventSequence] -> [EventSequence]
 
--- This function takes a logic fun, delay, initial state and event sequence for
--- each input
+-- An event sequence is a sequence of events along with their times
+type EventSequence = [Event]
+
+-- Logic function has a bunch of inputs and returns one output
+type LogicFunction = [Bool] -> Bool
+
+-- Gatestate is a list of true false states for a bunch of inputs/outputs
+type GateState = [Bool]
+
+-- The type element is a circuit component, that has multiple inputs and one
+-- output. It takes the initial gate state, the event sequence for all its
+-- inputs and returns the event sequence for the output.
+type Element = GateState -> [EventSequence] -> EventSequence
+
+-- Primitives simulate one output logic functions. To define a primitive, we
+-- need a logic function and a delay. It then gives us an element. 
 primitive :: LogicFunction -> Double -> GateState -> [EventSequence] -> EventSequence
--- Get the event sequence with minimum start time
--- Drop that from that sequence
--- Get new state, add event to sequence, recurse
 primitive lf de gs isq =
-  let minind = pick_min isq 9999999.0 (0-1) 0
+  -- Pick the input which has the earliest event.
+  let minind = pick_min isq (1/0) (0-1) 0
   in if minind < 0 
-       then []
-       else let ev = head (isq !! minind)
+       then [] -- If no events
+       else let ev = head (isq !! minind) -- Found an event, generate output and recurse
                 seq = take minind isq ++ [(tail (isq !! minind))] ++ drop (minind + 1) isq
                 oop = lf gs
                 ngs = take minind gs ++ [(snd ev)] ++ drop (minind + 1) gs
@@ -27,7 +34,7 @@ primitive lf de gs isq =
             in (de + (fst ev), nop):(primitive lf de ngs seq)
 
 
-
+-- Pick minimum from the event sequence. Need to skip inputs with no events
 pick_min :: [EventSequence] -> Double -> Int -> Int -> Int
 pick_min [] v def ind = def
 pick_min ([]:xs) v def ind = pick_min xs v def (ind + 1)
@@ -36,34 +43,43 @@ pick_min (x:xs) v def ind =
     then pick_min xs v def (ind + 1)
     else pick_min xs (fst (head x)) ind (ind + 1) 
 
-nglf :: GateState -> Bool
-nglf l = not (head l)
+type SingleInputLogicFunction = Bool -> Bool
+single_input_primitive :: SingleInputLogicFunction -> Double -> Bool -> EventSequence -> EventSequence
+single_input_primitive silf de gs isq = primitive (\x -> silf (head x)) de [gs] [isq]
 
-aglf :: GateState -> Bool
-aglf l = (foldl (&&) True l)
+type DoubleInputLogicFunction = Bool -> Bool -> Bool
+double_input_primitive :: DoubleInputLogicFunction -> Double -> (Bool, Bool) -> (EventSequence, EventSequence) -> EventSequence
+double_input_primitive dilf de gs isq = primitive (\x -> dilf (x !! 0) (x !! 1)) de [(fst gs), (snd gs)] [(fst isq), (snd isq)]
 
-ag1 :: [EventSequence] -> EventSequence
-ag1 = primitive aglf 0.2 [False]
+and_gate = double_input_primitive (&&) 0.2 (False, False)
 
-ag2 :: [EventSequence] -> EventSequence
-ag2 = primitive aglf 0.2 [True]
+or_gate = double_input_primitive (||) 0.1 (False, False)
+
+nand_gate = double_input_primitive ((&&) . not) 0.3 (False, False)
+
+xor_gate = double_input_primitive (\x y -> (x && (not y)) || ((not x) && y)) 0.4 (False, False)
+
+half_adder :: (EventSequence, EventSequence) -> (EventSequence, EventSequence)
+half_adder isq = (xor_gate isq, and_gate isq)
+
+full_adder :: (EventSequence, EventSequence, EventSequence) -> (EventSequence, EventSequence)
+full_adder (isq_a, isq_b, isq_c) =
+  let o1 = (xor_gate (isq_a, isq_b))
+      s = (xor_gate (o1, isq_c))
+      o2 = (and_gate (isq_a, isq_b))
+      o3 = (and_gate (o1, isq_c))
+      c = (and_gate (o2, o3))
+  in (s, c)
+
+ripple_adder :: [(EventSequence, EventSequence)] -> (EventSequence, [EventSequence])
+ripple_adder x = ripple_adder_h [(0.0, False)] x
+
+ripple_adder_h :: EventSequence -> [(EventSequence, EventSequence)] -> (EventSequence, [EventSequence])
+ripple_adder_h c [] = (c, [])
+ripple_adder_h c (x:xs) =
+  let addr = full_adder (fst x, snd x, c)
+      subckt = ripple_adder_h (snd addr) xs
+  in (fst subckt, (fst addr):(snd subckt))
 
 
-ro :: EventSequence
-ro = let o1 = ag1 [o2]
-         o2 = ag2 [o3]
-         o3 = ag1 [o1]
-     in o1
-
-
--- serial_connect :: [Element] -> Component -> GateState -> [EventSequence] -> [EventSequence]
-
--- parallel_connect :: [Component] -> Component
-
---connect :: Element -> Element -> Int -> Int -> GateState -> [EventSequence] -> EventSequence
---connect e1 e2 e1s inputid gs isq =
---  let esqe1 = take e1s isq
---    gse1 = take eis gs
---		esqe2tmp = drop t1s isq
---		esqe2f = take inputid esqe2tmp ++ [(e1 gse1 esqe1)] ++ 
 
