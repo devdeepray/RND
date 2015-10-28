@@ -18,10 +18,15 @@ type GateState = [Bool]
 -- inputs and returns the event sequence for the output.
 type Element = GateState -> [EventSequence] -> EventSequence
 
--- Primitives simulate one output logic functions. To define a primitive, we
--- need a logic function and a delay. It then gives us an element. 
+
 primitive :: LogicFunction -> Double -> GateState -> [EventSequence] -> EventSequence
 primitive lf de gs isq =
+  primitive_h lf de gs (zipWith (\x y -> ((0.0, x):y)) gs isq)
+
+-- Primitives simulate one output logic functions. To define a primitive, we
+-- need a logic function and a delay. It then gives us an element. 
+primitive_h :: LogicFunction -> Double -> GateState -> [EventSequence] -> EventSequence
+primitive_h lf de gs isq =
   -- Pick the input which has the earliest event.
   let minind = pick_min isq (1/0) (0-1) 0
   in if minind < 0 
@@ -31,7 +36,7 @@ primitive lf de gs isq =
                 oop = lf gs
                 ngs = take minind gs ++ [(snd ev)] ++ drop (minind + 1) gs
                 nop = lf ngs 
-            in (de + (fst ev), nop):(primitive lf de ngs seq)
+            in (de + (fst ev), nop):(primitive_h lf de ngs seq)
 
 
 -- Pick minimum from the event sequence. Need to skip inputs with no events
@@ -50,6 +55,8 @@ single_input_primitive silf de gs isq = primitive (\x -> silf (head x)) de [gs] 
 type DoubleInputLogicFunction = Bool -> Bool -> Bool
 double_input_primitive :: DoubleInputLogicFunction -> Double -> (Bool, Bool) -> (EventSequence, EventSequence) -> EventSequence
 double_input_primitive dilf de gs isq = primitive (\x -> dilf (x !! 0) (x !! 1)) de [(fst gs), (snd gs)] [(fst isq), (snd isq)]
+
+not_gate = single_input_primitive (not)
 
 and_gate = double_input_primitive (&&) 0.2 (False, False)
 
@@ -81,5 +88,11 @@ ripple_adder_h c (x:xs) =
       subckt = ripple_adder_h (snd addr) xs
   in (fst subckt, (fst addr):(snd subckt))
 
-
+-- Backward flow example
+ring_osc :: EventSequence
+ring_osc =
+  let o1 = not_gate 0.1 False o2
+      o2 = not_gate 0.1 True o3
+      o3 = not_gate 0.1 False o1
+  in o1
 
