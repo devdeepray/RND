@@ -18,8 +18,9 @@ type GateState = [Bool]
 -- inputs and returns the event sequence for the output.
 type Element = GateState -> [EventSequence] -> EventSequence
 
+type Delay = Double
 
-primitive :: LogicFunction -> Double -> GateState -> [EventSequence] -> EventSequence
+primitive :: LogicFunction -> Delay -> GateState -> [EventSequence] -> EventSequence
 primitive lf de gs isq =
   primitive_h lf de gs (zipWith (\x y -> ((0.0, x):y)) gs isq)
 
