@@ -18,14 +18,18 @@ type GateState = [Bool]
 -- inputs and returns the event sequence for the output.
 type Element = GateState -> [EventSequence] -> EventSequence
 
+type Delay = Double
 
-primitive :: LogicFunction -> Double -> GateState -> [EventSequence] -> EventSequence
-primitive lf de gs isq =
-  primitive_h lf de gs (zipWith (\x y -> ((0.0, x):y)) gs isq)
+type InputSequence = [EventSequence]
+type OutputSequence = EventSequence
+
+primitive :: LogicFunction -> Delay -> GateState -> InputSequence -> OutputSequence
+primitive lf d gs isq =
+  primitive_h lf d gs (zipWith (\x y -> ((0.0, x):y)) gs isq)
 
 -- Primitives simulate one output logic functions. To define a primitive, we
 -- need a logic function and a delay. It then gives us an element. 
-primitive_h :: LogicFunction -> Double -> GateState -> [EventSequence] -> EventSequence
+primitive_h :: LogicFunction -> Double -> GateState -> InputSequence -> OutputSequence
 primitive_h lf de gs isq =
   -- Pick the input which has the earliest event.
   let minind = pick_min isq (1/0) (0-1) 0
