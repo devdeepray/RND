@@ -8,18 +8,11 @@
 using namespace std;
 
 class TwoInput : private Component {
-protected:
-  TwoInput();
 public:
-  InputTerminal input1();
-  InputTerminal input2();
-  using Component::connect;
-  void connect(InputTerminal input_terminal);
+  void init(Terminal* output, Terminal* input1, Terminal* input2);
   using Component::get_output;
-  vector<bool> get_output(vector<bool> input);
+  bool get_output(vector<bool> input);
 protected:
   virtual bool get_output(bool val1, bool val2);
 };
-
-
 #endif // _TWOINPUT_H_

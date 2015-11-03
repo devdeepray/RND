@@ -1,10 +1,7 @@
 #include <probe.h>
 
-Probe::Probe() : Component(1, 0) {
-}
-
-InputTerminal Probe::input() {
-  return get_input_terminal(0);
+void Probe::init(Terminal* terminal) {
+  Component::init(NULL, vector<Terminal*>(1, terminal));
 }
 
 vector<Event> Probe::trigger_change(int input_index, bool val, float cur_time) {
@@ -15,4 +12,8 @@ vector<Event> Probe::trigger_change(int input_index, bool val, float cur_time) {
 
 vector<pair<float, bool> > Probe::get_probe_data() {
 	return probe_data;
+}
+
+void clear_probe() {
+  probe_data.clear();
 }

@@ -6,10 +6,9 @@
 
 class RingOscillator {
 	NotGate g1, g2, g3;
+	Terminal w1, w2;
 public:
-	RingOscillator();
-	void connect(InputTerminal input);
-	InputTerminal input();
+	void init(Terminal* w3);
 };
 
 #endif // _RINGOSCILLATOR_H_
