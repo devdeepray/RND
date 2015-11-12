@@ -8,7 +8,7 @@
 ;; graph is a vector of of "node"s, with each node having a payload and a vector
 ;; of neighbors. 
 (define (topsort graph)
-  (topsort-helper graph ;; Hash the graph for quick node lookup.
+  (topsort-helper graph
                   `() ;; Initialize list of sorted nodes.
                   (make-vector (vector-length graph) #f) ;; vector to keep track of explored nodes
                   (make-vector (vector-length graph) #f))) ;; vector to keep track of temp marks.
