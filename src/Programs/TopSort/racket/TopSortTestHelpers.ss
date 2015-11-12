@@ -3,21 +3,10 @@
 (provide gen-big-dag gen-sparse-dag test)
 
 (define (gen-big-dag n)
-  (define (helper n)
-    (cond [(= n 1) (list (node 0 `()))]
-          [else (let* ([smaller-dag (helper (- n 1))]
-                      [old-nbr (node-nbrs (car smaller-dag))]
-                      [new-nbr (cons (- n 2) old-nbr)])
-                  (cons (node (- n 1) new-nbr) smaller-dag))]))
-  (list->vector (reverse (helper n))))
+ (list->vector (map (lambda(x)(node x (create-seq (+ x 1) (- n 1)))) (create-seq 0 (- n 1)))))
 
-(define (gen-sparse-dag n deg)
-  (define (helper n)
-    (cond [(= n 1) (list (node 0 `()))]
-          [else (let* ([smaller-dag (helper (- n 1))]
-                       [new-nbr (create-seq (max 0 (- (- n 2) deg)) (- n 2))])
-                  (cons (node (- n 1) new-nbr) smaller-dag))]))
-  (list->vector (reverse (helper n))))
+(define (gen-sparse-dag n k)
+ (list->vector (map (lambda(x)(node x (create-seq (+ x 1) (min (+ x k) (- n 1))))) (create-seq 0 (- n 1)))))
 
 (define (create-seq i j)
   (cond [(> i j) `()]

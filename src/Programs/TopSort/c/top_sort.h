@@ -3,8 +3,6 @@
 
 #include "graph_node.h"
 
-void top_sort(int size, GraphNode** nodes, GraphNode** sorted);
-
-bool explore(GraphNode* node, GraphNode** sorted, int* index);
+bool top_sort(int size, GraphNode** nodes, GraphNode** sorted);
 
 #endif // _TOP_SORT_H_

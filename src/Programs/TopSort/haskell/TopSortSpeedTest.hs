@@ -3,47 +3,74 @@ import SpeedTest
 
 import Data.Array.IArray
 import Data.Ix
-import Data.Array.ST
 import Control.Monad.ST
+import Data.Graph
 
-get_next_node :: Integer -> (Integer, [Integer]) -> (Integer, [Integer])
-get_next_node new_node_num (prev_node_num, nbrs) =
- (new_node_num , reverse (prev_node_num : nbrs))
+-- gen_dense_node n i = (i, [i+1, ... n-1])
+gen_dense_node :: Int -> Int -> (Int, [Int])
+gen_dense_node n i = (i, [(i+1)..(n-1)])
 
-gen_big_dagh :: Integer -> [(Integer, [Integer])]
-gen_big_dagh 1 = [(0, [])]
-gen_big_dagh n = ((n - 1), new_nbrs) : smaller_dag
-  where
-  smaller_dag = gen_big_dagh (n - 1)
-  new_nbrs = (n - 2) : (snd (head smaller_dag))
-gen_big_dag n = array (0, n-1) (gen_big_dagh n)
+-- Generates a dense graph of the following form:
+-- 0 -> [1,2,3 ... n-1]
+-- 1 -> [2,3 ... n-1]
+-- n-1 -> []
+gen_dense_dag :: Int -> [(Int, [Int])]
+gen_dense_dag n =  (map (gen_dense_node n) [0..(n-1)])
 
-gen_sparse_dagh :: Integer -> Integer -> [(Integer, [Integer])]
-gen_sparse_dagh 1 deg = [(0, [])]
-gen_sparse_dagh n deg = ((n - 1), new_nbrs) : smaller_dag
-  where
-  smaller_dag = gen_sparse_dagh (n - 1) deg
-  new_nbrs = [(max 0 ((n - 2)-deg))..(n-2)]
+-- Generates a sparse graph of the following form:
+-- 0 -> [1,2,3 .. k]
+-- 1 -> [2,3,4 .. k+1]
+-- n-k -> [n-k+1, .. n-1]
+-- n-1 -> []
+gen_sparse_node :: Int -> Int -> Int -> (Int, [Int])
+gen_sparse_node n k i = (i, [(i+1)..(min (i+k) (n-1))])
 
-gen_sparse_dag n deg = array (0, n-1) (gen_sparse_dagh n deg)
+gen_sparse_dag :: Int -> Int -> [(Int, [Int])]
+gen_sparse_dag n k = (map (gen_sparse_node n k) [0..(n-1)])
 
-test gen start_dag end_dag delta num_run sorter_func =
- test_helper start_dag
+
+-- Measure speed of graph generation
+test_gen start_size end_size delta func =
+ test_helper start_size
  where
  test_helper dag_size
-  | dag_size > end_dag = putStr "done"
+  | dag_size > end_size = putStr""
   | otherwise =
-     do
-      putStr (show dag_size)
-      putStr ","
-      putStr (show (perf_test (head (topsort (gen dag_size))) num_run))
-      putStrLn ","
-      (test_helper (dag_size + delta))
+   do
+    putStr (show dag_size)
+    putStr ","
+    putStr (show (perf_test (func dag_size)))
+    putStrLn ","
+    (test_helper (dag_size + delta))
 
+--test gen start_dag end_dag delta num_run sorter_func =
+-- test_helper start_dag
+-- where
+-- test_helper dag_size
+--  | dag_size > end_dag = putStr "done"
+--  | otherwise =
+--     do
+--      putStr (show dag_size)
+--      putStr ","
+--      putStr (show (perf_test (head (topsort (gen dag_size))) num_run))
+--      putStrLn ","
+--     (test_helper (dag_size + delta))
+
+s = 1000
+e = 3000
+d = 100
 main = do
- putStr "[DENSE]"
- x <- test gen_big_dag 1000 10000 200 1 topsort
- putStr "[SPARSE]"
- test (\sz -> gen_sparse_dag sz 500) 1000 10000 200 1 topsort
- 
-
+ putStrLn "[DENSE_GEN]"
+ test_gen s e d gen_dense_dag
+ putStrLn "[DENSE_SORT_DEFINED]"
+ test_gen s e d (\x -> topsort (array (0, x-1) (gen_dense_dag x)))
+ putStrLn "[DENSE_SORT_INTERNAL]"
+ test_gen s e d (\x -> topSort (array (0, x-1) (gen_dense_dag x)))
+ putStrLn "[SPARSE_GEN]"
+ test_gen s e d gen_sparse_dag
+ putStrLn "[SPARSE_SORT_DEFINED]"
+ test_gen s e d (\x -> topSort (array (0, x-1) (gen_sparse_dag x 100)))
+ putStrLn "[SPARSE_SORT_INTERNAL]"
+ test_gen s e d (\x -> topSort (array (0, x-1) (gen_sparse_dag x 100)))
+-- putStr "[SPARSE]"
+-- test (\sz -> gen_sparse_dag sz d) s e 200 1 topsort

@@ -1,0 +1,61 @@
+	Wed Nov 11 18:00 2015 Time and Allocation Profiling Report  (Final)
+
+	   TopSortSpeedTest +RTS -p -RTS
+
+	total time  =        3.93 secs   (3927 ticks @ 1000 us, 1 processor)
+	total alloc = 7,403,895,792 bytes  (excludes profiling overheads)
+
+COST CENTRE MODULE    %time %alloc
+
+contains    TopSort    56.6   49.1
+chop        TopSort    14.5   10.8
+gen_node    Main       11.0   15.3
+generate    TopSort     6.4   13.8
+postordTr   TopSort     5.4    5.4
+postordFr   TopSort     4.7    5.4
+benchmark   SpeedTest   1.2    0.0
+
+
+                                                                   individual     inherited
+COST CENTRE              MODULE                  no.     entries  %time %alloc   %time %alloc
+
+MAIN                     MAIN                     51           0    0.0    0.0   100.0  100.0
+ main                    Main                    103           0    0.0    0.0   100.0  100.0
+  test_gen               Main                    106           0    0.0    0.0   100.0  100.0
+   test_gen.test_helper  Main                    107          12    0.0    0.0   100.0  100.0
+    main.\               Main                    116           6    0.0    0.0    93.5   92.3
+     gen_dense_dag       Main                    124           6    0.0    0.0     5.8    7.7
+      gen_node           Main                    125        9000    5.8    7.7     5.8    7.7
+     topsort             TopSort                 117           6    0.0    0.0    87.7   84.6
+      postOrd            TopSort                 118           6    0.0    0.0    87.7   84.6
+       dfforest          TopSort                 120           6    0.0    0.0    77.6   73.8
+        vertices         TopSort                 128           0    0.0    0.0     0.0    0.0
+        dfs              TopSort                 121           6    0.0    0.0    77.6   73.8
+         generate        TopSort                 129     7104500    6.4   13.8     6.4   13.8
+         prune           TopSort                 122           6    0.0    0.0    71.1   60.0
+          chop           TopSort                 126     7113506   14.5   10.8    71.1   60.0
+           include       TopSort                 131        9000    0.1    0.1     0.1    0.1
+           contains      TopSort                 130     7104500   56.6   49.1    56.6   49.1
+          mkEmpty        TopSort                 123           6    0.0    0.0     0.0    0.0
+       postordFr         TopSort                 119        9006    4.7    5.4    10.1   10.8
+        postordTr        TopSort                 132        9000    5.4    5.4     5.4    5.4
+    gen_dense_dag        Main                    114           6    0.0    0.0     5.2    7.7
+     gen_node            Main                    115        9000    5.2    7.7     5.2    7.7
+    perf_test            SpeedTest               110          12    0.0    0.0     1.2    0.0
+     benchmark           SpeedTest               111          12    1.2    0.0     1.2    0.0
+      getCPUTimeMS       SpeedTest               113           0    0.0    0.0     0.0    0.0
+ CAF                     SpeedTest               101           0    0.0    0.0     0.0    0.0
+  getCPUTimeMS           SpeedTest               112           1    0.0    0.0     0.0    0.0
+ CAF                     TopSort                 100           0    0.0    0.0     0.0    0.0
+  vertices               TopSort                 127           1    0.0    0.0     0.0    0.0
+ CAF                     Main                     99           0    0.0    0.0     0.0    0.0
+  test_gen               Main                    108           0    0.0    0.0     0.0    0.0
+   test_gen.test_helper  Main                    109           0    0.0    0.0     0.0    0.0
+  main                   Main                    102           1    0.0    0.0     0.0    0.0
+   test_gen              Main                    104           2    0.0    0.0     0.0    0.0
+    test_gen.test_helper Main                    105           2    0.0    0.0     0.0    0.0
+ CAF                     GHC.Conc.Signal          93           0    0.0    0.0     0.0    0.0
+ CAF                     GHC.IO.Encoding          87           0    0.0    0.0     0.0    0.0
+ CAF                     GHC.IO.Encoding.Iconv    85           0    0.0    0.0     0.0    0.0
+ CAF                     GHC.IO.Handle.FD         77           0    0.0    0.0     0.0    0.0
+ CAF                     GHC.IO.Handle.Text       75           0    0.0    0.0     0.0    0.0

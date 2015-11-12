@@ -6,7 +6,7 @@ import Data.Array.ST
 import Control.Monad.ST
 
 -- Representation of a graph as a table of vertices
-type Vertex = Integer
+type Vertex = Int
 type Table a = Array Vertex a
 type Graph =  Table [Vertex]
 

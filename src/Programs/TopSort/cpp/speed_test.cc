@@ -20,64 +20,47 @@ long getCurrentTime() {
 
 /**
  * Generate a dense graph without cycles.
- * Generated graph has O(n^2) edges and node i has edges to 
+ * Generated graph has O(n^2) edges and node i has edges to
  * nodes < i.
  */
 vector<GraphNode*> genGraph(int n, vector<GraphNode> &nodes) {
 
   vector<GraphNode*> nodeList(n);
-  
-  nodeList[0] = &(nodes[0]);
-
-  for (int i = 1; i < n; ++i) {
-    GraphNode* last = nodeList[i - 1];
-    GraphNode* newNode = &(nodes[i]);
-    std::vector<GraphNode*> last_neighbors = last->getNeighbors();
-    for (auto it = last_neighbors.begin();
-         it != last_neighbors.end();
-         ++it) {
-      newNode->addNeighbor(*it);
+  for (int i = 0; i < n; ++i) {
+    nodes[i] = GraphNode(i);
+    nodeList[i] = &nodes[i];
+    for (int j = i+1; j < n; ++j) {
+      nodes[i].addNeighbor(&nodes[j]);
     }
-    newNode->addNeighbor(last);
-    nodeList[i] = newNode;
   }
+
   return nodeList;
 }
 
 vector<GraphNode*> genSparseGraph(int n, int deg, vector<GraphNode> &nodes) {
   vector<GraphNode*> nodeList(n);
-
-  nodeList[0] = &(nodes[0]);
-
-  for (int i = 1; i < n; ++i) {
-    GraphNode* last = nodeList[i - 1];
-    GraphNode* newNode = &(nodes[i]);
-    std::vector<GraphNode*> last_neighbors = last->getNeighbors();
-    int k = 0;
-    for (int k = max(0, (int)last_neighbors.size() - deg); k < last_neighbors.size(); ++k) {
-      newNode->addNeighbor(last_neighbors[k]);
+  for (int i = 0; i < n; ++i) {
+    nodes[i] = GraphNode(i);
+    nodeList[i] = &nodes[i];
+    for (int j = i+1; j <= min(i+deg, n-1); ++j) {
+      nodes[i].addNeighbor(&nodes[j]);
     }
-    newNode->addNeighbor(last);
-    nodeList[i] = newNode;
   }
+
   return nodeList;
-}  
+}
 
 int main() {
 
-  int NUM_RUNS = 10;
+	int START = 1000, END = 3000, DELTA = 100, NUM_RUN = 10;
   cout << "[DENSE]" << endl;
-  for (int size = 1000; size <= 10000; size += 200) {
+  for (int size = START; size <= END; size += DELTA) {
     vector<GraphNode> nodes(size);
-    for (int i = 0; i < size; ++i) {
-      nodes[i].n = i;
-    }
     vector<GraphNode*> nodeList = genGraph(size, nodes);
     vector<GraphNode*> sorted;
     long start = getCurrentTime();
-    for (int i = 0; i < NUM_RUNS; ++i) {
-      sorted = top_sort(nodeList);
-    }
+		for (int i = 0; i < NUM_RUN; ++i)
+    sorted = top_sort(nodeList);
     // Uncomment to see sorted list
     /*for (auto node : sorted) {
       cout << node->n << ": " ;
@@ -87,22 +70,21 @@ int main() {
       cout << endl;
     }*/
     long end = getCurrentTime();
-    long numedges = (size * (size - 1)) / 2 + size; 
-    cout << numedges << "," << (double) (end - start) / NUM_RUNS << "," << endl;
+    long numedges = (size * (size - 1)) / 2 + size;
+    cout << size << "," << (double) (end - start) / NUM_RUN << "," << endl;
   }
-  NUM_RUNS = 100;
+  NUM_RUN = 100;
   cout << "[SPARSE]" << endl;
-  for (int size = 1000; size <= 10000; size += 200) {
+  for (int size = START; size <= END; size += DELTA) {
     vector<GraphNode> nodes(size);
     for (int i = 0; i < size; ++i) {
       nodes[i].n = i;
     }
-    vector<GraphNode*> nodeList = genSparseGraph(size, 500, nodes);
+    vector<GraphNode*> nodeList = genSparseGraph(size, 100, nodes);
     vector<GraphNode*> sorted;
     long start = getCurrentTime();
-    for (int i = 0; i < NUM_RUNS; ++i) {
-      sorted = top_sort(nodeList);
-    }
+		for (int i = 0; i < NUM_RUN; ++i)
+    sorted = top_sort(nodeList);
     // Uncomment to see sorted list
     /*for (auto node : sorted) {
       cout << node->n << ": " ;
@@ -113,7 +95,7 @@ int main() {
     }*/
     long end = getCurrentTime();
     long numedges = size * 500;
-    cout << numedges << "," << (double) (end - start) / NUM_RUNS << "," << endl;
+    cout << size << "," << (double) (end - start) / NUM_RUN << "," << endl;
   }
 
 

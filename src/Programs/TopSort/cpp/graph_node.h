@@ -8,15 +8,12 @@
 class GraphNode {
 private:
   std::vector<GraphNode*> neighbors;
-  bool explored;
-  bool temp_marked;
+  int ind;
 public:
   int n; // Placeholder for data to be stored in the node.
 
-  GraphNode(int _n) {
-    n = _n;
-    explored = false;
-    temp_marked = false;
+  GraphNode(int _ind) {
+    ind = _ind;
   }
 
   GraphNode() {
@@ -31,20 +28,9 @@ public:
     return neighbors;
   }
 
-  void setExplored(bool val) {
-    explored = val;
-  }
-  
-  bool getExplored() {
-    return explored;
-  }
-
-  void setTemp(bool val) {
-    temp_marked = val;
-  }
-
-  bool getTemp() {
-    return temp_marked;
+  int getInd() {
+    return ind;
   }
 };
+
 #endif // _GRAPH_NODE_H_
