@@ -1,16 +1,9 @@
 #include <notgate.h>
 
-NotGate::NotGate() : Component(1, 1) {
+NotGate::NotGate(Terminal* output, Terminal* input) {
+  init(output, vector<Terminal*>(1, input));
 }
 
-InputTerminal NotGate::input() {
-  return get_input_terminal(0);
-}
-
-void NotGate::connect(InputTerminal input_terminal) {
-  connect(0, input_terminal);
-}
-
-vector<bool> NotGate::get_output(vector<bool> input) {
-  return vector<bool>(1, !input[0]);
+bool NotGate::get_output(vector<bool> input) {
+  return !input[0];
 }

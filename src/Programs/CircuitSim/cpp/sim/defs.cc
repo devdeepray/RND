@@ -20,3 +20,11 @@ InputTerminal::InputTerminal(Component* _component, int _input_index) {
 
 InputTerminal::InputTerminal() {
 }
+
+vector<InputTerminal> Terminal::connections() {
+	return conns;
+}
+
+void Terminal::attach(InputTerminal terminal) {
+	conns.push_back(terminal);
+}

@@ -25,4 +25,10 @@ struct Event {
 
 	bool operator<(const Event &e2) const;
 };
+
+struct Terminal {
+	vector<InputTerminal> conns;
+	vector<InputTerminal> connections();
+	void attach(InputTerminal t);
+};
 #endif

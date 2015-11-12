@@ -1,22 +1,14 @@
 #include <twoinput.h>
 
-TwoInput::TwoInput() : Component(2, 1) {
+void TwoInput::init(Terminal* output, Terminal* input1, Terminal* input2) {
+	vector<Terminal*> tmp;
+	tmp.push_back(input1);
+	tmp.push_back(input2);
+	Component::init(output, tmp);
 }
 
-InputTerminal TwoInput::input1() {
-  return get_input_terminal(0);
-}
-
-InputTerminal TwoInput::input2() {
-  return get_input_terminal(1);
-}
-
-void TwoInput::connect(InputTerminal input_terminal) {
-  connect(0, input_terminal);
-}
-
-vector<bool> TwoInput::get_output(vector<bool> input) {
-  return vector<bool>(1, get_output(input[0], input[1]));
+bool TwoInput::get_output(vector<bool> input) {
+  return get_output(input[0], input[1]);
 }
 
 bool TwoInput::get_output(bool val1, bool val2) {

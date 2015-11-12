@@ -9,12 +9,9 @@ using namespace std;
 
 class NotGate : private Component {
 public:
-	NotGate();
-  InputTerminal input();
-  using Component::connect;
-  void connect(InputTerminal input_terminal);
+	NotGate(Terminal* output, Terminal* input);
   using Component::get_output;
-  vector<bool> get_output(vector<bool> input);
+  bool get_output(vector<bool> input);
 };
 
 

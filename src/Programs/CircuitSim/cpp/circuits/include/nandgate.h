@@ -5,6 +5,7 @@
 
 class NandGate : public TwoInput {
   bool get_output(bool val1, bool val2);
+  using TwoInput::TwoInput;
 };
 
 #endif // _NANDGATE_H_

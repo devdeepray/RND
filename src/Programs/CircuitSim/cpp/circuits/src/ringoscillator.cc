@@ -1,15 +1,8 @@
 #include <ringoscillator.h>
 
-RingOscillator::RingOscillator() {
-	g1.connect(g2.input());
-	g2.connect(g3.input());
-	g3.connect(g1.input());
-}
+void RingOscillator::init(Terminal* w3) {
+	g1.init(w1, w2);
+	g2.init(w2, w3);
+	g3.init(w3, w1);
 
-void RingOscillator::connect(InputTerminal input) {
-	g1.connect(input);
-}
-
-InputTerminal RingOscillator::input() {
-	return g1.input();
 }

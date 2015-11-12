@@ -1,11 +1,11 @@
-#ifndef _ANDGATE_H_
-#define _ANDGATE_H_
+#ifndef _ORGATE_H_
+#define _ORGATE_H_
 
 #include <twoinput.h>
 
-class AndGate : public TwoInput {
+class OrGate : public TwoInput {
   bool get_output(bool val1, bool val2);
   using TwoInput::TwoInput;
 };
 
-#endif // _ANDGATE_H_
+#endif // _ORGATE_H_

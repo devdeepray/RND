@@ -10,8 +10,7 @@ using namespace std;
 class Probe : private Component {
 	vector<pair<float, bool> > probe_data;
 public:
-	Probe();
-  InputTerminal input();
+	void init(Terminal* terminal);
   vector<Event> trigger_change(int input_index, bool val, float cur_time);
 	vector<pair<float, bool> > get_probe_data();
 	void clear_probe();
