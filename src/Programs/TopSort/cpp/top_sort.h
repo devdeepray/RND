@@ -2,6 +2,7 @@
 #define _TOP_SORT_H_
 
 #include <vector>
+#include <algorithm>
 #include "graph_node.h"
 using namespace std;
 
