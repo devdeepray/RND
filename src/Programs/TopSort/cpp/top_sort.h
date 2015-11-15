@@ -10,6 +10,6 @@ using namespace std;
  * the vector of nodes, returning a list of integers in the sorted order.
  * Returns empty list if topsort not possible.
  */
-vector<GraphNode*> top_sort(const vector<GraphNode*> &graphNodes);
+vector<GraphNode *> top_sort(const vector<GraphNode *> &graphNodes);
 
 #endif // _TOP_SORT_H_
