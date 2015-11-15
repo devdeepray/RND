@@ -5,7 +5,7 @@ struct GraphNode {
   int n; // Placeholder for data
   int ind;
   int numnbrs;
-  GraphNode** nbrs;
+  GraphNode **nbrs;
 };
 
 #endif
