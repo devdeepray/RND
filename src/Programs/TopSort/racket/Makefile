@@ -1,7 +1,8 @@
 all:
 	raco exe TopSortSpeedTest.ss
+	mv TopSortSpeedTest TopSortSpeedTest.exe
 clean:
-	rm -f TopSortSpeedTest
+	rm -f TopSortSpeedTest.exe
 	rm -rf compiled
 data:
-	./TopSortSpeedTest > topsortdata.csv
+	./TopSortSpeedTest.exe > topsortdata.csv
