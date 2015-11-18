@@ -6,9 +6,9 @@
                 (display a)
                 (display ",")
                 (collect-garbage)
-                (display (perf-test (lambda() (nqueen a)) 1))
+                (display (log (perf-test (lambda() (nqueen a)) 1)))
                 (display ",")
                 (newline)
                 (test (+ a 1) b))]))
-
+(define y (test 4 10))
 (define x (test 4 14))

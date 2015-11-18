@@ -5,10 +5,10 @@
 #include <sys/time.h>
 using namespace std;
 
-long getCurrentTime() {
+double getCurrentTime() {
   struct timeval tp;
   gettimeofday(&tp, NULL);
-  long int ms = tp.tv_sec * 1000 + tp.tv_usec / 1000;
+  double ms = tp.tv_sec * 1000 + tp.tv_usec / 1000.0;
   return ms;
 }
 
@@ -53,11 +53,16 @@ int countNQueen(int n) {
 }
 
 int main() {
-  for (int i = 4; i <= 14; ++i) {
-    long start = getCurrentTime();
+   for (int i = 4; i <= 14; ++i) {
+    double start = getCurrentTime();
     countNQueen(i);
-    long end = getCurrentTime();
-    cout << i << ", " << (end - start) << endl;
+    double end = getCurrentTime();
+  }
+ for (int i = 4; i <= 14; ++i) {
+    double start = getCurrentTime();
+    countNQueen(i);
+    double end = getCurrentTime();
+    cout << i << ", " << log(end - start) << endl;
   }
 }
 

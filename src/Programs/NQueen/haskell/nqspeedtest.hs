@@ -16,7 +16,7 @@ test start end =
      do
       putStr (show n)
       putStr ","
-      putStr (show (perf_test (head (head (nqueen n))) 1))
+      putStr (show (log (perf_test (nqueen n))))
       putStrLn ","
       (test_helper (n + 1))
 

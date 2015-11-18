@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h> 
+#include <sys/time.h>
+#include <math.h>
 typedef unsigned int uint;
 uint count = 0;
  
@@ -73,10 +74,10 @@ void solve(int n)
 }
  
 
-long getCurrentTime() {
+double getCurrentTime() {
   struct timeval tp;
   gettimeofday(&tp, NULL);
-  long int ms = tp.tv_sec * 1000 + tp.tv_usec / 1000;
+  double ms = tp.tv_sec * 1000 + tp.tv_usec / 1000.0;
   return ms;
 }
 
@@ -86,10 +87,10 @@ int main(int c, char **v)
 {
  
          for (int i = 4; i <= 17; ++i) {
-         long start = getCurrentTime();
+         double start = getCurrentTime();
    	  solve(i);
-   	 long end = getCurrentTime();
-    	cout << i << ", " << (end - start) << endl;
+   	 double end = getCurrentTime();
+    	cout << i << ", " << log(end - start) << endl;
  	 }
 
 	return 0;

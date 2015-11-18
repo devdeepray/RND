@@ -94,7 +94,7 @@ struct queens
     index_type row = 0;
     while (true)
     {
-      // Advance the queen along the row
+      // Advance the queen adouble the row
       ++solution[ row ];
  
       // (If we get past halfway through the first row, we're done.)
@@ -119,7 +119,7 @@ struct queens
             s.hflip();     solutions.insert( s );
             s.vflip();     solutions.insert( s );
           }
-          // otherwise begin marching a queen along the next row
+          // otherwise begin marching a queen adouble the next row
           else solution[ ++row ] = -1;
         }
  
@@ -234,10 +234,10 @@ main program
 /////////////////////////////////////////////////////////////////////////// */
  
 #include <sys/time.h>
-long getCurrentTime() {
+double getCurrentTime() {
   struct timeval tp;
   gettimeofday(&tp, NULL);
-  long int ms = tp.tv_sec * 1000 + tp.tv_usec / 1000;
+  double ms = tp.tv_sec * 1000 + tp.tv_usec / 1000.0;
   return ms;
 }
 
@@ -257,10 +257,10 @@ int usage( const std::string& name )
 int main( int argc, char** argv )
 {
   for (int i = 4; i <= 14; ++i) {
-         long start = getCurrentTime();
+         double start = getCurrentTime();
           queens k(i);
-         long end = getCurrentTime();
-        std::cout << i << ", " << (end - start) << std::endl;
+         double end = getCurrentTime();
+        std::cout << i << ", " << log(end - start) << std::endl;
          }
 
         return 0;
