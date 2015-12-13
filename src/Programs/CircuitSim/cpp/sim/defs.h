@@ -12,7 +12,6 @@ struct InputTerminal {
 	int input_index;
 
 	InputTerminal(Component* _component, int _input_index);
-	InputTerminal();
 };
 
 struct Event {
